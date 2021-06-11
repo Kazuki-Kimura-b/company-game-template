@@ -1,0 +1,16 @@
+{
+  "__type__": "cc.Material",
+  "_name": "NegaMaterial",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "814bbe6d-a81a-436a-9d09-4d5d9dd7dd7e"
+  },
+  "_techniqueData": {
+    "0": {
+      "defines": {
+        "USE_TEXTURE": true
+      }
+    }
+  }
+}

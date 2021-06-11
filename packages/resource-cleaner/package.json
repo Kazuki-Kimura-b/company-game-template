@@ -1,0 +1,22 @@
+{
+  "name": "resource-cleaner",
+  "version": "0.0.1",
+  "description": "The package template for getting started.",
+  "author": "Cocos Creator",
+  "main": "main.js",
+  "main-menu": {
+    "i18n:MAIN_MENU.package.title/resource-cleaner/open": {
+      "message": "resource-cleaner:open"
+    },
+    "i18n:MAIN_MENU.package.title/resource-cleaner/hello": {
+      "message": "resource-cleaner:say-hello"
+    }
+  },
+  "panel": {
+    "main": "panel/index.js",
+    "type": "dockable",
+    "title": "resource-cleaner",
+    "width": 400,
+    "height": 300
+  }
+}

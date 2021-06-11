@@ -1,0 +1,15 @@
+version: '3'
+services:
+  aws-cli:
+    build:
+      context: .
+    image: aws_cli_image
+    volumes:
+      - ./build/web-mobile:/web-mobile:cached
+    tty: true
+    stdin_open: true
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: "ap-northeast-1"
+

@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "7292693c-2be3-4a84-b9a0-8100a024d179",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 80,
+  "height": 110,
+  "platformSettings": {},
+  "subMetas": {
+    "haya_result_numB7_01": {
+      "ver": "1.0.4",
+      "uuid": "1b349021-d251-49b2-a681-ad6da75e9919",
+      "rawTextureUuid": "7292693c-2be3-4a84-b9a0-8100a024d179",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 80,
+      "height": 110,
+      "rawWidth": 80,
+      "rawHeight": 110,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

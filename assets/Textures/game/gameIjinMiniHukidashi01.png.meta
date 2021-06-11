@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "9724cc45-1559-49dc-944a-acc62f8bb1e3",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 406,
+  "height": 217,
+  "platformSettings": {},
+  "subMetas": {
+    "gameIjinMiniHukidashi01": {
+      "ver": "1.0.4",
+      "uuid": "7a495664-dd5e-4e6b-becc-0382857c6199",
+      "rawTextureUuid": "9724cc45-1559-49dc-944a-acc62f8bb1e3",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 406,
+      "height": 217,
+      "rawWidth": 406,
+      "rawHeight": 217,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

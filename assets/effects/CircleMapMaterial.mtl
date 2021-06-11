@@ -1,0 +1,19 @@
+{
+  "__type__": "cc.Material",
+  "_name": "CircleMapMaterial",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "f05d943a-35a6-43d9-abd1-8c9f1f294853"
+  },
+  "_techniqueIndex": 0,
+  "_techniqueData": {
+    "0": {
+      "defines": {
+        "USE_TEXTURE": true,
+        "USE_CIRCLE_MAP": true
+      },
+      "props": {}
+    }
+  }
+}

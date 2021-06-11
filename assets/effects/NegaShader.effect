@@ -1,0 +1,91 @@
+// Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd. 
+
+//---------------------------------------------------------------------------
+// 色の反転
+//---------------------------------------------------------------------------
+
+
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: vs
+      frag: fs
+      blendState:
+        targets:
+        - blend: true
+      rasterizerState:
+        cullMode: none
+      properties:
+        texture: { value: white }
+        alphaThreshold: { value: 0.5 }
+}%
+
+
+CCProgram vs %{
+  precision highp float;    //精度の定義
+
+  #include <cc-global>
+  #include <cc-local>
+
+  in vec3 a_position;   // attributeからinに変更。cocos-engineから頂点情報を受け取る
+  in vec4 a_color;      // cocos-engineから色情報を受け取る
+  out vec4 v_color;     // varyingからoutに変更。フラグメントシェーダーに色情報を渡す
+
+  #if USE_TEXTURE       // テクスチャを使用する場合
+  in vec2 a_uv0;        // 一般的なシェーダーのtexCoord(テクスチャの情報)のこと。cocos-engineからテクスチャ情報を受け取る
+  out vec2 v_uv0;       // フラグメントシェーダーにテクスチャ情報を渡す
+  #endif
+
+  void main () {
+    vec4 pos = vec4(a_position, 1);     // vec3をvec4に変換
+
+    #if CC_USE_MODEL
+    pos = cc_matViewProj * cc_matWorld * pos;
+    #else
+    pos = cc_matViewProj * pos;   // 座標情報を調整するための変数cc_matViewProj と頂点座標を掛け合わせる
+    #endif
+
+    #if USE_TEXTURE
+    v_uv0 = a_uv0;          // テクスチャ情報はそのままフラグメントシェーダーへ渡す
+    #endif
+
+    v_color = a_color;      // 色情報はそのままフラグメントシェーダーへ渡す
+
+    gl_Position = pos;      // OpenGLで処理する頂点情報に渡す
+  }
+}%
+
+
+CCProgram fs %{
+  precision highp float;    //精度の定義
+  
+  #include <alpha-test>
+
+  in vec4 v_color;        // バーテックスシェーダーから受け取った色情報がここに入る
+
+  #if USE_TEXTURE
+  in vec2 v_uv0;          // バーテックスシェーダーから受け取ったテクスチャ情報がここに入る
+  uniform sampler2D texture;    // エディタのマテリアルのプロパティ画面からの入力値がここに入る（と予想）
+  #endif
+
+  void main () {
+    vec4 o = vec4(1, 1, 1, 1);    // OpenGLに色情報を渡すためのvec4の型を作る。これにテクスチャ情報や色情報を掛け合わせる
+
+    #if USE_TEXTURE
+    o *= texture(texture, v_uv0);
+      #if CC_USE_ALPHA_ATLAS_TEXTURE
+      o.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
+      #endif
+    #endif
+
+    o *= v_color;     // バーテックスシェーダーから受け取ったカラー情報をここで用意した色情報に掛け合わせる
+    
+    //さらに白黒反転をかける
+    o = vec4(1.0 - o.x, 1.0 - o.y, 1.0 - o.z, o.w);
+
+
+    ALPHA_TEST(o);
+
+    gl_FragColor = o;     // OpenGLで処理する色情報に渡す
+  }
+}%

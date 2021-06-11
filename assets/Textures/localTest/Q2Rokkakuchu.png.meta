@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "934f1731-3398-4647-9b80-756d6ed69dc3",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 106,
+  "height": 175,
+  "platformSettings": {},
+  "subMetas": {
+    "Q2Rokkakuchu": {
+      "ver": "1.0.4",
+      "uuid": "74ba9e98-b5cc-4caa-920d-8ba84e63fc7f",
+      "rawTextureUuid": "934f1731-3398-4647-9b80-756d6ed69dc3",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 106,
+      "height": 175,
+      "rawWidth": 106,
+      "rawHeight": 175,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

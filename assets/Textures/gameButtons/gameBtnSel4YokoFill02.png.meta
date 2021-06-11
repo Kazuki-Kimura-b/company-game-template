@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "df507a4d-fbc3-48d4-803b-20885e906d49",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 162,
+  "height": 162,
+  "platformSettings": {},
+  "subMetas": {
+    "gameBtnSel4YokoFill02": {
+      "ver": "1.0.4",
+      "uuid": "f21f274f-e54e-40e4-b3d3-6f8019206ba7",
+      "rawTextureUuid": "df507a4d-fbc3-48d4-803b-20885e906d49",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 162,
+      "height": 162,
+      "rawWidth": 162,
+      "rawHeight": 162,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}
