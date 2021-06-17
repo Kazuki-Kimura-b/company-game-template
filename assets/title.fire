@@ -157,6 +157,9 @@
     "loadingBar": {
       "__id__": 11
     },
+    "playerIcon": {
+      "__uuid__": "73069839-1c9e-484d-95d7-17c780eda967"
+    },
     "seStartButton": {
       "__uuid__": "31e866f0-b1e2-4186-9565-aab6af32e01a"
     },

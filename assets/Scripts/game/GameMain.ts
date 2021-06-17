@@ -3,9 +3,9 @@ import HintControl from "./HintControl";
 import SceneChanger from "../common/SceneChanger";
 import SchoolAPI from "../common/SchoolAPI";
 import StaticData, { GameMode, SpecialEvent } from "../StaticData";
+import { PlayerData } from "../common/Models";
 import AC from "../answerComponents/AC";
 import QuestionData from "./QuestionData";
-import TestLocalData from "./TestLocalData";
 import GameBG from "./bg/GameBG";
 import Hukidashi from "./Hukidashi";
 import KaisetsuWindow from "./KaisetsuWindow";
@@ -16,9 +16,7 @@ import FinishScreen from "./FinishScreen";
 import SleepListener from "../common/SleepListener";
 import AllKaitou from "./AllKaitou";
 import StoryScreen from "../introduction/StoryScreen";
-import GameBG_Ghost from "./bg/GameBG_Ghost";
-import { CollectionItem, ComboRanking, CPUData, OpponentCPU, PlayerData, SchoolEnd, UseGameItem } from "../common/Models";
-import ScoreRanking from "./ScoreRanking";
+import { CollectionItem, CPUData, SchoolEnd, UseGameItem } from "../common/Models";
 import NegaEffector from "../common/NegaEffector";
 import VSScreen from "./VSScreen";
 import IjinScreen from "./IjinScreen";
@@ -27,7 +25,6 @@ import { GameSE } from "./GameSEComponent";
 import PlayerStatusBar from "../common/PlayerStatusBar";
 import ScoreBar from "./ScoreBar";
 import ScoreBarGhost from "./ScoreBarGhost";
-import ScoreBarPreview from "./ScoreBarPreview";
 import UnkoGet from "./UnkoGet";
 import GhostPlayer from "./GhostPlayer";
 import STFormat from "../common/STFormat";
@@ -36,7 +33,6 @@ import BugTracking from "../common/BugTracking";
 import SystemIcon from "../common/SystemIcon";
 import QuestionWindow from "./QuestionWindow";
 import GameEndScreen from "./GameEndScreen";
-import PlayTrackLog from "../common/PlayTrackLog";
 import GhostScreen from "../introduction/GhostScreen";
 
 
@@ -106,9 +102,10 @@ export default class GameMain extends cc.Component {
 	@property(cc.SpriteFrame) imgLoadErrorSpriteFrame: cc.SpriteFrame = null;
 	@property(IjinScreen) ijinScreen:IjinScreen = null;
 	@property(cc.Node) bgParentNode: cc.Node = null;
-	@property(cc.Prefab) bgPrefabs: cc.Prefab[] = [];
+	@property(cc.Prefab) bgPrefab: cc.Prefab =  null;
 	@property(FrontEffect) frontEffect :FrontEffect = null;
 	@property(cc.Node) resultParentNode: cc.Node = null;
+	@property(cc.Prefab) scoreBarPrefab:cc.Prefab = null;
 	@property(cc.Prefab) scoreBarHayabenPrefab:cc.Prefab = null;
 	@property(cc.Prefab) scoreBarGoribenPrefab:cc.Prefab = null;
 	@property(cc.Prefab) scoreBarGhostPrefab:cc.Prefab = null;
@@ -132,7 +129,7 @@ export default class GameMain extends cc.Component {
 	@property(cc.Node) questionWindowParentNode:cc.Node = null;
 	@property(cc.Node) kaisetsuWindowParentNode:cc.Node = null;
 	@property(cc.Node) ghostScreenParentNode:cc.Node = null;
-	
+
 	@property(cc.Prefab) unkoGetPrefab: cc.Prefab = null;
 	@property(cc.Prefab) allKaitouPrefab: cc.Prefab = null;
 	@property(cc.Prefab) storyScreenPrefab: cc.Prefab = null;
@@ -155,7 +152,7 @@ export default class GameMain extends cc.Component {
 	private _QNum :number = 0;
 	private _IMG_RES:any = null;
 	private _loadImageList :string[] = [];		//読み込む画像リスト
-	
+
 	private _gameBG: GameBG = null;
 	private _combo: number = 0;		//正解コンボ数		★ScoreDetail行き？
 	private _rightAnswerCount: number = 0;		//正解数		★ScoreDetail行き？
@@ -182,7 +179,7 @@ export default class GameMain extends cc.Component {
 	private _itemSpeedBonus:number = 1;
 	private _itemComboBonus:number = 1;
 	private _ghostAction:cc.Action = null;
-	
+
 	private _gameScore:number = 0;
 	private _sendAnswers:{question_id:string, answer:string, required_time:number, hint:boolean}[] = [];
 	private _correctHistories:boolean[] = [];
@@ -199,9 +196,9 @@ export default class GameMain extends cc.Component {
 
 	//コンボの得点リスト
 	public static readonly COMBO_SCORE_LIST:number[] = [0,0,10,15,15,15,15,20,20,20,20];
-	
+
 	/** オフラインテスト。APIを叩かず実行する単体テスト */
-	private OFFLINE_TEST:boolean = false;
+	// private OFFLINE_TEST:boolean = false;
 
 
 
@@ -233,46 +230,15 @@ export default class GameMain extends cc.Component {
 	 */
     start ()
     {
-		PlayTrackLog.add("GameMain.start()");
-
-		//cc.log(PlayTrackLog.getLog());
-		
-		//単体テスト
-		if(StaticData.playerData == null)
-		{
-			cc.log("単体テスト");
-			this.OFFLINE_TEST = true;
-			SchoolAPI.dummyDataMode();		//API使わずダミーの値を返すようにする
-
-			SchoolAPI.titlePage((response:PlayerData)=>{ StaticData.playerData = response; });
-			//SE.SE_Enabled = StaticData.playerData.se_enabled;
-			SE.SE_Enabled = true;
-			StaticData.playerData.iconSpriteFrame = null;		//ダミーアイコン
-
-			SchoolAPI.opponentCPUs((response:OpponentCPU)=>{ StaticData.opponentCPUs = response; });
-
-			//ローカルのダミーデータを作成
-			let testLocalData :TestLocalData = this.getComponent(TestLocalData);
-			StaticData.ijinData.ijinImageSpriteFrame = testLocalData.dummyIjinImg;
-			StaticData.ijinData.verticalBGSpriteFrame = testLocalData.dummyBGImg;
-
-			//ゴースト問題テスト用
-			StaticData.gameModeID = GameMode.HAYABEN;
-		}
-
-		
-
+		if (!StaticData.playerData) StaticData.playerData = new PlayerData("A", true, 1, 1, 1, "", 1, 1, "プレイヤー", 1, true);
 		this._sceneChanger = this.getComponent(SceneChanger);
 		this._negaEffector = this.getComponent(NegaEffector);
 		this._QNum = 0;
 		this._combo = 0;
 		this._rightAnswerCount = 0;
 		this._IMG_RES = {};
-		this._alwayShowHint = (StaticData.gameModeID == GameMode.HAYABEN || StaticData.gameModeID == GameMode.GHOST);
-		if(StaticData.previewMode) this._alwayShowHint = false;
 
 		this._scoreDetail = new ScoreDetail();
-		if(StaticData.gameModeID == GameMode.GHOST) this._ghostScore = new ScoreDetail();
 	
 		this.ijinScreen.setup();
 		this.ijinScreen.hide();
@@ -302,31 +268,10 @@ export default class GameMain extends cc.Component {
 
 		// BGの設定
 		let bgNode:cc.Node;
-
-		if(StaticData.gameModeID == GameMode.GORIBEN && ! StaticData.previewMode)
-		{
-			bgNode = new cc.Node();
-			bgNode.width = 750;
-			bgNode.height = 1600;
-
-			//偉人の時代の背景を表示
-			let sprite:cc.Sprite = bgNode.addComponent(cc.Sprite);
-			sprite.spriteFrame = StaticData.ijinData.verticalBGSpriteFrame;
-			this._gameBG = bgNode.addComponent(GameBG);
-		}
-		// BGをプレハブから読み込む
-		else
-		{
-			let bgID:number = StaticData.gameModeID;
-			if(StaticData.previewMode) bgID = this.bgPrefabs.length - 1;		//グリッド表示
-			else if(this.OFFLINE_TEST) bgID = this.bgPrefabs.length - 1;		//グリッド表示
-			
-			bgNode = cc.instantiate(this.bgPrefabs[bgID]);
-			this._gameBG = bgNode.getComponent(GameBG);
-		}
-
+		bgNode = cc.instantiate(this.bgPrefab); // shutokuで入れてあるよ
+		this._gameBG = bgNode.getComponent(GameBG);
 		this.bgParentNode.addChild(bgNode);
-		this._gameBG.setup();		//背景を初期化
+		this._gameBG.setup(); //背景を初期化
 
 
 
@@ -335,31 +280,30 @@ export default class GameMain extends cc.Component {
 		sleepListener.onResume(()=>
 		{
 			this.node.active = false;
-			
+
 			//タイトル画面に戻す
 			SE.bgmStop();
 
 			cc.director.loadScene("title");
 		});
 
-		
+
 		this.comboDisp.node.active = false;
 		this.timeBonusDisp.active = false;
 		this.noHintBonusDisp.active = false;
 		this.comboBonusDisp.active = false;
-		
-		
+
 		let ksNode:cc.Node = cc.instantiate(this.kaisetsuWindowPrefab);
 		this.kaisetsuWindowParentNode.addChild(ksNode);
-		
+
 		this._kaisetsuWindow = ksNode.getComponent(KaisetsuWindow);
 		this._kaisetsuWindow.setup(this, this.canvas);
 		this._kaisetsuWindow.node.active = false;
-		
+
 		this._questionWindow.node.active = false;
 		this.finishTextNode.active = false;
 		this.ijinHukidashiNode.active = false;
-		
+
 
 
 		this.frontEffect.setup();
@@ -373,86 +317,38 @@ export default class GameMain extends cc.Component {
 		this.hintControl.setFaceIcons(this.userIconSpriteFrames);
 
 		this.hintControl.hideHintButton();		//ヒントボタンを隠す
-		
-		
-		
-		let scoreBarPrefab:cc.Prefab;
 
-		//プレビューモード
-		if(StaticData.previewMode)
-		{
-			scoreBarPrefab = this.scoreBarPreviewPrefab;
-			
-			//プレビューモード時はミュート
-			SE.SE_Enabled = false;
-			SE.BGM_Enabled = false;
 
-			this.frontEffect.hideLoadingBar();
-		}
-		//ハヤベン
-		else if(StaticData.gameModeID == GameMode.HAYABEN)
-		{
-			scoreBarPrefab = this.scoreBarHayabenPrefab;
-		}
-		//ゴースト
-		else if(StaticData.gameModeID == GameMode.GHOST)
-		{
-			scoreBarPrefab = this.scoreBarGhostPrefab;
-		}
-		//ゴリベン
-		else if(StaticData.gameModeID == GameMode.GORIBEN)
-		{
-			scoreBarPrefab = this.scoreBarGoribenPrefab;
 
-			let format:STFormat = STFormat.create
-			({
-				size: 36,
-				margin: 2,
-				lineHeight: 60,
-				rows: 2,
-				columns: 8,
-				horizontalAlign: SchoolText.HORIZONTAL_ALIGH_CONTENTS_LEFT,
-				verticalAlign: SchoolText.VERTICAL_ALIGN_CENTER,
-				color: cc.color(0,0,0),
-				yomiganaSize: 20,
-				yomiganaMarginY: 2
-			});
-			this.ijinHukidashiOutput.createText("", format);
-		}
-		//確認テスト
-		else if(StaticData.gameModeID == GameMode.KAKUNIN_TEST)
-		{
-			scoreBarPrefab = this.scoreBarHayabenPrefab;
-		}
+		let format:STFormat = STFormat.create
+		({
+			size: 36,
+			margin: 2,
+			lineHeight: 60,
+			rows: 2,
+			columns: 8,
+			horizontalAlign: SchoolText.HORIZONTAL_ALIGH_CONTENTS_LEFT,
+			verticalAlign: SchoolText.VERTICAL_ALIGN_CENTER,
+			color: cc.color(0,0,0),
+			yomiganaSize: 20,
+			yomiganaMarginY: 2
+		});
+		this.ijinHukidashiOutput.createText("", format);
 
-		let sbNode:cc.Node = cc.instantiate(scoreBarPrefab);
-		this.scoreBarParentNode.addChild(sbNode);
+		let scoreBarNode:cc.Node = cc.instantiate(this.scoreBarPrefab);
+		this.scoreBarParentNode.addChild(scoreBarNode);
 
-		this._scoreBar = sbNode.getComponent(ScoreBar);
+		this._scoreBar = scoreBarNode.getComponent(ScoreBar);
 		this._scoreBar.setup();		//ゴリベン：アイコン３つ読み込み
 
-		if(StaticData.previewMode)
-		{
-			let preview:ScoreBarPreview = this._scoreBar as ScoreBarPreview;
-			preview.setupGameMain(this);
-
-			this.hintControl.shortKaisetsu("preview ver " + StaticData.PREVIEW_MODE_VERSION);
-			this.hintControl.startHint();
-
-
-			this._sceneStart();		//プレビューはここで終わり
-			return;
-		}
-
-        
 		//---- 初期化終了 ----
-		
+
 
 		//終了のスクリーン
 		let finishScreenNode:cc.Node = cc.instantiate(this.finishScreenPrefab);
 		this.finishScreenParentNode.addChild(finishScreenNode);
 		this._finishScreen = finishScreenNode.getComponent(FinishScreen);
-		this._finishScreen.setupWithCloseAtGameMode(StaticData.gameModeID);
+		this._finishScreen.setupWithCloseAtGameMode(StaticData.gameModeID); // ゲームモードによって色が変わる
 
 
 		//フィニッシュのスクリーンがはける音
@@ -482,23 +378,9 @@ export default class GameMain extends cc.Component {
 
 	private _sceneStart():void
 	{
-		PlayTrackLog.add("GameMain._sceneStart()");
 		
 		this.frontEffect.initialize();
 
-
-		//this._endAPIResponse = new SchoolEnd(0,0,0,0,null,0,0,0,0,0,0,0,false,0,0,0,0,0,0,0, new CollectionItem("創造", "{釈,しゃ}{迦,か}【シャカ】", "きらびやかなうんこだなあ。\nありがたやありがたや。", "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/005_unko.png", 1, null) );
-		//this._showUnkoGetPopup(()=>{});
-		//return;
-		
-		
-		//プレビューモードの場合問題を取得しない
-		if(StaticData.previewMode)
-		{
-			//this.frontEffect.showLoadingBar(0.5);		//最初から50%
-			return;
-		}
-		
 		//問題とライバルの画像を取得
 		this._loadQuestions(()=>
 		{
@@ -607,8 +489,8 @@ export default class GameMain extends cc.Component {
 
 		//BGM読み込み中コメント表示
 		this.hintControl.loadingBgm();
-		
-		
+
+
 		//曲の読み込み開始
 		cc.loader.loadRes("BGM/" + bgmFileName, cc.AudioClip,
 		(completedCount:number, totalCount:number, item:any)=>
@@ -620,7 +502,7 @@ export default class GameMain extends cc.Component {
 		(error:Error, resource:any)=>
 		{
 			let bgmClip:cc.AudioClip = resource;
-			
+
 			//BGM開始
 			SE.bgmStart(bgmClip);
 
@@ -629,160 +511,142 @@ export default class GameMain extends cc.Component {
 	}
 
 
-	
+
 
 	/**
 	 * 問題データの取得
 	 */
-	private _loadQuestions (callback:()=>void):void
-	{
+	private _loadQuestions (callback: ()=>void): void {
 		//問題データ読み込み中コメント表示
 		this.hintControl.loadingQuestionData();
 
-		// ゲーム開始API
-		if(! this.OFFLINE_TEST)		//かつてのStaticData.debugBlockAPI
-		{
-			cc.log("API START (GAME START) ----------------");
-			SchoolAPI.schoolStart(StaticData.gameModeName, (startResponse:any)=>
-			{
-				//リクエストトークンを取得
-				this._requestToken = startResponse.token;
-				cc.log("REQUEST_TOKEN : " + this._requestToken);
-				
-				//基本のセリフをAPIから取得
-				this.hintControl.setupBasicHints(startResponse);
+		// APIに接続し、tokenを取得
+		SchoolAPI.exStart(StaticData.companyGameMode, StaticData.reference, (response): void => {
+			// リクエストトークンを取得
+			this._requestToken = response.token;
 
-				//偉人の情報を保持
-				this._cpu_datas = startResponse.cpu_data;
+			//基本のセリフをAPIから取得
+			this.hintControl.setupBasicHints(response);
 
-				//経験値ブースト
-				if(StaticData.gameModeID == GameMode.GORIBEN)
-				{
-					if(startResponse.score_magnification) this._scoreMagnification = startResponse.score_magnification;
-				}
-				
-				
-				//問題データをAPIから取得
-				cc.log("API GET QUESTION DATAS ----------------");
-				SchoolAPI.getSchoolQuestion(this._requestToken, (response)=>
-				{
-					this._qDatas = QuestionData.createQuestionDatas(response);
+			// 問題データを取得
+			cc.loader.loadRes("json/questions", (err, res) => {
+				this._qDatas = res.json;
+				cc.log(this._qDatas);
+				this._makeLoadImageList();
 
-					if(this._qDatas.length < 10)
-					{
-						BugTracking.notify("取得問題不足", "GameMain", { msg:"取得した問題データ数は" + this._qDatas.length + "問で不足しています。", response:response });
-						return;
-					}
-
-					this._makeLoadImageList();
-					cc.log(this._loadImageList);
-
-
-					//ごり勉モードは偉人の画像も読み込む
-					if(StaticData.gameModeID == GameMode.GORIBEN)
-					{
-						if(this._cpu_datas.length < 3)
-						{
-							BugTracking.notify("CPUデータ不足", "GameMain", { msg:"CPUデータが不足しています : " + this._cpu_datas.length, cpu_datas:this._cpu_datas });
-							return;
-						}
-
-						//ザコ３体のデータを作成
-
-						//スコアバーに偉人3体の最終スコアを渡す
-
-						//偉人を表示
-						this.ijinScreen.setIjinImage(StaticData.ijinData.ijinImageSpriteFrame);
-						this.ijinScreen.show();
-
-						callback();
-
-					}
-					//ゴーストモードはゴーストを表示
-					else if(StaticData.gameModeID == GameMode.GHOST)
-					{
-						//画面右下にゴーストを仮配置
-						let node:cc.Node = cc.instantiate(this.ghostPlayerPrefab);
-						this._ghostPlayer = node.getComponent(GhostPlayer);
-						this._ghostPlayer.setup();
-
-						let ijinImgSp:cc.Sprite = this.ijinScreen.ijinSprite;
-						ijinImgSp.node.addChild(node);
-						ijinImgSp.enabled = false;		//スプライト自体は切る
-
-						this.ijinScreen.show();
-
-						let ghostScoreBar:ScoreBarGhost = this._scoreBar as ScoreBarGhost;
-						ghostScoreBar.setupGhostScore(this._qDatas);
-
-
-
-						callback();
-					}
-					else if(StaticData.gameModeID == GameMode.HAYABEN)
-					{
-						//this._loadQuestionImages(0);
-						callback();
-					}
-					else if(StaticData.gameModeID == GameMode.KAKUNIN_TEST)
-					{
-						callback();
-					}
-					else
-					{
-						BugTracking.notify("条件分岐エラー", "GameMain", { msg:"ここにはこないはず" });
-					}
-
-				});
-			});
-		}
-		//---------------------------------------------------------------------------------------------
-		//
-		//  ローカルからダミーの問題データを取得
-		//
-		else
-		{
-			//ごり勉モードは偉人の画像も読み込む
-			if(StaticData.gameModeID == GameMode.GORIBEN)
-			{
-				this._challengers = [
-					new Challenger("自分", null, null, 400),
-					new Challenger("ざこば", null, null, 100),
-					new Challenger("にかく", null, null, 200),
-					new Challenger("べいちょう", null, null, 300)
-				];
-				
-				//スコアボードの初期化が必要
-
-				//this.scoreBoard.goribenSetup(
-				//	[ this._challengers[0].icon, this._challengers[1].icon, this._challengers[2].icon, this._challengers[3].icon ],
-				//	[ 0, this._challengers[1].targetScore, this._challengers[2].targetScore, this._challengers[3].targetScore ]
-				//);
-
-				//ダミーの偉人を右下に表示
+				//偉人を表示
 				this.ijinScreen.setIjinImage(StaticData.ijinData.ijinImageSpriteFrame);
 				this.ijinScreen.show();
-			}
-			
-			//ローカルのダミーデータを作成
-			let testLocalData :TestLocalData = this.getComponent(TestLocalData);
-			
-			//基本のセリフをローカルのダミーから取得
-			this.hintControl.setupBasicHints(testLocalData.getBasicHits());
 
-			//ローカルのダミー問題を読み込み
-			this._qDatas = (StaticData.LOCAL_Q_DATA_BIG) ? testLocalData.bigData() : testLocalData.smallData();
-
-			//ローカルのダミー画像を読み込み
-			testLocalData.setupImage(this._IMG_RES);
-
-			//この問題から開始
-			this._QNum = testLocalData.getQuestionNum();
-
-			//this._gameStart();
-			callback();
-		}
+				callback();
+			})
+		});
 	}
+
+
+	// private _loadQuestions (callback:()=>void):void
+	// {
+	// 	//問題データ読み込み中コメント表示
+	// 	this.hintControl.loadingQuestionData();
+
+	// 	// ゲーム開始API
+	// 	if(! this.OFFLINE_TEST)		//かつてのStaticData.debugBlockAPI
+	// 	{
+	// 		cc.log("API START (GAME START) ----------------");
+	// 		SchoolAPI.schoolStart(StaticData.gameModeName, (startResponse:any)=>
+	// 		{
+	// 			//リクエストトークンを取得
+	// 			this._requestToken = startResponse.token;
+	// 			cc.log("REQUEST_TOKEN : " + this._requestToken);
+				
+	// 			//基本のセリフをAPIから取得
+	// 			this.hintControl.setupBasicHints(startResponse);
+
+	// 			//偉人の情報を保持
+	// 			this._cpu_datas = startResponse.cpu_data;
+
+	// 			//経験値ブースト
+	// 			if(StaticData.gameModeID == GameMode.GORIBEN)
+	// 			{
+	// 				if(startResponse.score_magnification) this._scoreMagnification = startResponse.score_magnification;
+	// 			}
+				
+				
+	// 			//問題データをAPIから取得
+	// 			cc.log("API GET QUESTION DATAS ----------------");
+	// 			SchoolAPI.getSchoolQuestion(this._requestToken, (response)=>
+	// 			{
+	// 				this._qDatas = QuestionData.createQuestionDatas(response);
+
+	// 				if(this._qDatas.length < 10)
+	// 				{
+	// 					BugTracking.notify("取得問題不足", "GameMain", { msg:"取得した問題データ数は" + this._qDatas.length + "問で不足しています。", response:response });
+	// 					return;
+	// 				}
+
+	// 				this._makeLoadImageList();
+	// 				cc.log(this._loadImageList);
+
+
+	// 				//ごり勉モードは偉人の画像も読み込む
+	// 				if(StaticData.gameModeID == GameMode.GORIBEN)
+	// 				{
+	// 					if(this._cpu_datas.length < 3)
+	// 					{
+	// 						BugTracking.notify("CPUデータ不足", "GameMain", { msg:"CPUデータが不足しています : " + this._cpu_datas.length, cpu_datas:this._cpu_datas });
+	// 						return;
+	// 					}
+
+	// 					//ザコ３体のデータを作成
+
+	// 					//スコアバーに偉人3体の最終スコアを渡す
+
+	// 					//偉人を表示
+	// 					this.ijinScreen.setIjinImage(StaticData.ijinData.ijinImageSpriteFrame);
+	// 					this.ijinScreen.show();
+
+	// 					callback();
+
+	// 				}
+	// 				//ゴーストモードはゴーストを表示
+	// 				else if(StaticData.gameModeID == GameMode.GHOST)
+	// 				{
+	// 					//画面右下にゴーストを仮配置
+	// 					let node:cc.Node = cc.instantiate(this.ghostPlayerPrefab);
+	// 					this._ghostPlayer = node.getComponent(GhostPlayer);
+	// 					this._ghostPlayer.setup();
+
+	// 					let ijinImgSp:cc.Sprite = this.ijinScreen.ijinSprite;
+	// 					ijinImgSp.node.addChild(node);
+	// 					ijinImgSp.enabled = false;		//スプライト自体は切る
+
+	// 					this.ijinScreen.show();
+
+	// 					let ghostScoreBar:ScoreBarGhost = this._scoreBar as ScoreBarGhost;
+	// 					ghostScoreBar.setupGhostScore(this._qDatas);
+
+
+
+	// 					callback();
+	// 				}
+	// 				else if(StaticData.gameModeID == GameMode.HAYABEN)
+	// 				{
+	// 					//this._loadQuestionImages(0);
+	// 					callback();
+	// 				}
+	// 				else if(StaticData.gameModeID == GameMode.KAKUNIN_TEST)
+	// 				{
+	// 					callback();
+	// 				}
+	// 				else
+	// 				{
+	// 					BugTracking.notify("条件分岐エラー", "GameMain", { msg:"ここにはこないはず" });
+	// 				}
+
+	// 			});
+	// 		});
+	// 	}
+	// }
 
 
 
@@ -906,7 +770,6 @@ export default class GameMain extends cc.Component {
 	 */
     private _gameStart ():void
     {
-		PlayTrackLog.add("GameMain._gameStart()");
 
 		/*
 		//結果画面を確認
@@ -959,11 +822,11 @@ export default class GameMain extends cc.Component {
 		//画像データを渡す
 		this._questionWindow.setImageResources(this._IMG_RES);
 
-		if(StaticData.previewMode)
-		{
-			this._setupQuestion();
-			return;
-		}
+		// if(StaticData.previewMode)
+		// {
+		// 	this._setupQuestion();
+		// 	return;
+		// }
 		
 		//ゲーム開始処理 (BGMなど)
         
@@ -971,15 +834,6 @@ export default class GameMain extends cc.Component {
 		
 		//背景、準備完了時
 		this._gameBG.ready();
-
-		
-
-		//オフラインテスト中ならカウントダウンを飛ばす
-		if(this.OFFLINE_TEST)
-		{
-			this._setupQuestion();
-			return;
-		}
 
 		//カウントダウンSE
 		SE.play(GameSE.clip.startCountDown);
@@ -1336,17 +1190,17 @@ export default class GameMain extends cc.Component {
 			this._makeSeikaiHukidashi();
 
 
-			//短い解説がコメントに出る
-			if(StaticData.previewMode)
-			{
-				//通常の方式で出そうとすると_nextQuestion()内でキャンセルがかかるので、ここで即表示させてる
-				this.hintControl.putHint(this._qDatas[this._QNum].explain_short, Hukidashi.TYPE_KAISETSU);
-			}
-			else if(StaticData.gameModeID != GameMode.HAYABEN)
-			{
-				this.hintControl.shortKaisetsu(this._qDatas[this._QNum].explain_short);
-				//this.hintControl.startHint();	//ブロックの外に出した
-			}
+			// //短い解説がコメントに出る
+			// if(StaticData.previewMode)
+			// {
+			// 	//通常の方式で出そうとすると_nextQuestion()内でキャンセルがかかるので、ここで即表示させてる
+			// 	this.hintControl.putHint(this._qDatas[this._QNum].explain_short, Hukidashi.TYPE_KAISETSU);
+			// }
+			// else if(StaticData.gameModeID != GameMode.HAYABEN)
+			// {
+			// 	this.hintControl.shortKaisetsu(this._qDatas[this._QNum].explain_short);
+			// 	//this.hintControl.startHint();	//ブロックの外に出した
+			// }
 			this.hintControl.startHint();		//正解コメント、短い解説などの表示
 
 
@@ -1368,14 +1222,6 @@ export default class GameMain extends cc.Component {
 				);
 			}
 
-
-
-			//プレビューはここで終わり
-			if(StaticData.previewMode)
-			{
-				this._nextQuestion();
-				return;
-			}
 
 			//ウンコが飛び出す。10 + 正解数
 			this._putUnkoEffect(10 + this._rightAnswerCount, this.comboDisp.node.position, 1.5, 0.04);
@@ -1621,9 +1467,9 @@ export default class GameMain extends cc.Component {
 			let winNow:boolean = (pSc >= gSc);
 
 			//背景の色を変える
-			let ghostBG:GameBG_Ghost = this._gameBG.getComponent(GameBG_Ghost);
-			if(winNow) ghostBG.changeWinBG();
-			else ghostBG.changeLoseBG();
+			// let ghostBG:GameBG_Ghost = this._gameBG.getComponent(GameBG_Ghost);
+			// if(winNow) ghostBG.changeWinBG();
+			// else ghostBG.changeLoseBG();
 		}
 
 	}
@@ -1869,8 +1715,7 @@ export default class GameMain extends cc.Component {
 		//スライドで横にはける
 		this._questionWindow.moveOut(()=>
 		{
-			if(StaticData.previewMode) return;
-			
+
 			this._QNum ++;
 
 			if (this._QNum == this._qDatas.length)
@@ -1892,7 +1737,6 @@ export default class GameMain extends cc.Component {
 
 	private _preFinishSendAPI()
 	{
-		PlayTrackLog.add("GameMain._preFinishSendAPI()");
 		
 		cc.log("--- 結果算出 ------");
 		let totalBaseItemScore:number = this._scoreDetail.base * this._itemCorrectBonus;
@@ -1937,21 +1781,6 @@ export default class GameMain extends cc.Component {
 		cc.log("送信するデータの正解、不正解");
 		cc.log(this._correctHistories);
 
-
-		//確認テストの場合、一旦ここで終わる
-		if(StaticData.gameModeID == GameMode.KAKUNIN_TEST)
-		{
-			//いったんBGM止める
-			SE.bgmStop();
-			
-			StaticData.specialEvent = SpecialEvent.KAKUNIN_END;
-			
-			cc.director.loadScene("opening_B");
-
-			return;
-		}
-
-
 		//サーバに回答送信
 		SchoolAPI.postSchoolQuestion(this._sendAnswers, this._requestToken, (response:any)=>
 		{
@@ -1965,7 +1794,6 @@ export default class GameMain extends cc.Component {
 
 	private _sendEndGameAPI():void
 	{
-		PlayTrackLog.add("GameMain._sendEndGameAPI()");
 		
 		//ごり勉なら偉人のスコアを送信する
 		let mainCpuScore:number = 0;
@@ -2130,7 +1958,6 @@ export default class GameMain extends cc.Component {
 	 */
 	private _showResult():void
 	{
-		PlayTrackLog.add("GameMain._showResult()");
 		
 		this.finishTextNode.runAction(
 			cc.sequence(
@@ -2170,28 +1997,28 @@ export default class GameMain extends cc.Component {
 		//---------------------------------------------------------
 		// 結果画面：ゴースト問題
 		//
-		else if (StaticData.gameModeID == GameMode.GHOST)
-		{
-			resultPrefab = this.resultGhostPrefab;
+		// else if (StaticData.gameModeID == GameMode.GHOST)
+		// {
+		// 	resultPrefab = this.resultGhostPrefab;
 			
-			data.response = this._endAPIResponse;
-			data.canvasNode = this.canvas.node;
-			data.oldTensaiPower = StaticData.playerData.maxPower;
-			data.ghostBG = this._gameBG;
+		// 	data.response = this._endAPIResponse;
+		// 	data.canvasNode = this.canvas.node;
+		// 	data.oldTensaiPower = StaticData.playerData.maxPower;
+		// 	data.ghostBG = this._gameBG;
 
-			let ghostLastScore:number = (this.OFFLINE_TEST) ? this._endAPIResponse.high_score : this._scoreBar.getResultData().lastScore;
-			if(this._endAPIResponse.high_score != ghostLastScore)
-			{
-				BugTracking.notify("ゴースト・スコアずれ", "GameMain._showResult()",
-				{
-					msg:"スコアずれ発生：\nゲーム内：" + ghostLastScore + "\nサーバ：" + this._endAPIResponse.high_score,
-					game_score:ghostLastScore,
-					api_score:this._endAPIResponse.high_score,
-					response:this._endAPIResponse
-				});
-			}
+		// 	let ghostLastScore:number = (this.OFFLINE_TEST) ? this._endAPIResponse.high_score : this._scoreBar.getResultData().lastScore;
+		// 	if(this._endAPIResponse.high_score != ghostLastScore)
+		// 	{
+		// 		BugTracking.notify("ゴースト・スコアずれ", "GameMain._showResult()",
+		// 		{
+		// 			msg:"スコアずれ発生：\nゲーム内：" + ghostLastScore + "\nサーバ：" + this._endAPIResponse.high_score,
+		// 			game_score:ghostLastScore,
+		// 			api_score:this._endAPIResponse.high_score,
+		// 			response:this._endAPIResponse
+		// 		});
+		// 	}
 
-		}
+		// }
 		//---------------------------------------------------------
 		// 結果画面：ゴリ勉　とか？
 		//
@@ -2218,26 +2045,6 @@ export default class GameMain extends cc.Component {
 
 		let result:Result = resultNode.getComponent(Result);
 		result.setHintControl(this.hintControl);
-
-
-		/*
-		//試しにコンボランキングを差し込んでみる
-		if(StaticData.gameModeID == StaticData.MODE_ID_HAYABEN || StaticData.gameModeID == StaticData.MODE_ID_GHOST)
-		{
-			result.onShowCompleteCallback((code:number)=>
-			{
-				let rankingNode:cc.Node = cc.instantiate(this.comboRankingPrefab);
-				let ranking:ScoreRanking = rankingNode.getComponent(ScoreRanking);
-				this.contentsNode.addChild(rankingNode);
-				
-				let rankingList:ComboRanking[] = TestLocalData.getDummyScoreRanking(10, 20);
-				rankingList[10].nickname = StaticData.playerData.nickname;
-				ranking.setup(this.canvas, rankingList, 10);
-			});
-		}
-		*/
-
-		
 
 		//ゴリベン、ゴースト専用のResultを出す
 		result.setup(data, (code:number)=>
@@ -2351,7 +2158,6 @@ export default class GameMain extends cc.Component {
 	 */
 	private _showStoryEndMenu(data:any, finishScreen:FinishScreen)
 	{
-		PlayTrackLog.add("GameMain._showStoryEndMenu()");
 		
 		//画面上のステータスを表示
 		let statusNode:cc.Node = cc.instantiate(this.playerStatusBarPrefab);
@@ -2481,7 +2287,7 @@ export default class GameMain extends cc.Component {
 				this._showVsScreen();
 				//結果画面を消す
 				result.node.removeFromParent();
-				
+
 			}
 			//----------------------------
 			// ゴリベン：「次の偉人」ボタン
@@ -2493,7 +2299,6 @@ export default class GameMain extends cc.Component {
 			// もう一度修行をする
 			else if(code == Result.RTN_SC_RE_TRAINING)
 			{
-				PlayTrackLog.add("GameMain:もう一度修行するを選択");
 
 				//ゴーストならゴースト登場
                 SchoolAPI.ghostModeFlag((response:any)=>
@@ -2506,7 +2311,7 @@ export default class GameMain extends cc.Component {
                     if(! ghostModeFlag)
                     {
                         StaticData.gameModeID = GameMode.HAYABEN;
-						
+
 						this._finishScreen.hideFinishTexts();
 						this._finishScreen.finishShow(()=>
 						{
@@ -2516,8 +2321,7 @@ export default class GameMain extends cc.Component {
                     }
 
                     cc.log("ゴースト出現");
-					PlayTrackLog.add("再修業でゴースト出現");
-					
+
                     //ゴースト出現演出とうんこ先生との会話
                     let ghostScreenNode:cc.Node = cc.instantiate(this.ghostScreenPrefab);
                     this.ghostScreenParentNode.addChild(ghostScreenNode);
@@ -2525,7 +2329,7 @@ export default class GameMain extends cc.Component {
                     ghostScreen.setup(this.canvas, null, this._finishScreen.node, ()=>
                     {
                         StaticData.gameModeID = GameMode.GHOST;
-						
+
 						this._finishScreen.hideFinishTexts();
 						this._finishScreen.finishShow(()=>
 						{
@@ -2556,7 +2360,6 @@ export default class GameMain extends cc.Component {
 				//これもう使ってない
 				this._finishScreen.finishShow(()=>
 				{
-					StaticData.specialEvent = SpecialEvent.GHOST_END;
 					cc.director.loadScene("opening_B");
 				});
 			}
@@ -2621,22 +2424,20 @@ export default class GameMain extends cc.Component {
 	//再戦のためのVS画面表示
 	private _showVsScreen():void
 	{
-		PlayTrackLog.add("GameMain._showVsScreen()");
-		
 		//VS用BGMに変更
 		SE.bgmStart(GameSE.clip.vsBGM);
-		
+
 		this._playerStatusBar.backButtonEnabled(false);
 		this._playerStatusBar.settingButtonEnabled(false);
 		this._playerStatusBar.hideSkipButton();
         this._playerStatusBar.showStatus();     //ステータスを表示
-		
+
 
 		let vsScreenNode:cc.Node = cc.instantiate(this.vsScreenPrefab);
 		this.resultParentNode.addChild(vsScreenNode);
 
 		let vsScreen:VSScreen = vsScreenNode.getComponent(VSScreen);
-		
+
 		//if(this.OFFLINE_TEST) this._vsScreen.offlineTest();
 
 		vsScreen.setCanvasAndCamera(this.canvas, null);
@@ -2713,22 +2514,11 @@ export default class GameMain extends cc.Component {
     // update (dt) {},
     
 	
-	
 
-
-
-	private _getTestLocalData():TestLocalData
-	{
-		let tld:TestLocalData = this.getComponent(TestLocalData);
-		if(tld) return tld;
-		return this.addComponent(TestLocalData);
-	}
 
 
 	onDestroy():void
 	{
-		PlayTrackLog.add("GameMain.onDestroy()");
-		
 		//動いてるtweenをすべて止める
 		cc.Tween.stopAll();
 		this.node.stopAllActions();

@@ -175,27 +175,17 @@
     "bgParentNode": {
       "__id__": 9
     },
-    "bgPrefabs": [
-      null,
-      {
-        "__uuid__": "c504aaa7-2b11-4a0e-b18f-3e594268ac56"
-      },
-      {
-        "__uuid__": "60aa1d07-311f-41e1-86c1-2e5a20a53d2e"
-      },
-      null,
-      {
-        "__uuid__": "60aa1d07-311f-41e1-86c1-2e5a20a53d2e"
-      },
-      {
-        "__uuid__": "7ed04554-5b6a-483c-935b-6a96ff08d85e"
-      }
-    ],
+    "bgPrefab": {
+      "__uuid__": "c504aaa7-2b11-4a0e-b18f-3e594268ac56"
+    },
     "frontEffect": {
       "__id__": 68
     },
     "resultParentNode": {
       "__id__": 34
+    },
+    "scoreBarPrefab": {
+      "__uuid__": "422102e9-82fb-41bb-a520-6c449843127c"
     },
     "scoreBarHayabenPrefab": {
       "__uuid__": "422102e9-82fb-41bb-a520-6c449843127c"

@@ -3,6 +3,8 @@ import SleepListener from "../common/SleepListener";
 import TapEffect from "../common/TapEffect";
 import SE from "../common/SE";
 import AnsButton from "../answerComponents/AnsButton";
+import StaticData from "../StaticData";
+import SchoolAPI from "../common/SchoolAPI";
 
 const {ccclass, property} = cc._decorator;
 
@@ -18,6 +20,7 @@ export default class TitleMain extends cc.Component {
     @property(cc.Node) markR: cc.Node = null;
     @property(cc.Node) markU: cc.Node = null;
     @property(cc.Node) loadingBar: cc.Node = null;
+    @property(cc.SpriteFrame) playerIcon = null;
     @property({type:cc.AudioClip}) seStartButton:cc.AudioClip = null;
     @property({type:cc.AudioClip}) seShowAnswerButton:cc.AudioClip = null;  //ここでは使わない。ボタン初期化のため
 
@@ -31,6 +34,29 @@ export default class TitleMain extends cc.Component {
      */
     start ()
     {
+        SchoolAPI.importGameSettings(() => {
+            this.gameStart();
+        });
+    }
+
+    gameStart(): void {
+        if (StaticData.testMode) {
+            // テストモード
+            let query =  window.location.search;
+            cc.log(query);
+            if (query) {
+                query = query.slice(1);
+            } else {
+                cc.log("特にクエリがないよ");
+            }
+        } else {
+            // 本番環境
+            let rf: string = window.location.search;
+            if (rf) {
+                rf = rf.slice(1);
+                StaticData.reference = rf;
+            }
+        }
 
         AnsButton.setShowAnswreButtonSE(this.seShowAnswerButton);
 

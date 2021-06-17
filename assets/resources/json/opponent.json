@@ -1,68 +1,25 @@
-
+{
+  "cpu_data": [
     {
-        "cpu_data": [
-          {
-            "short_name": "ソクラテス_0",
-            "target_score": 123,
-            "thumbnail_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_thumbnail.png",
-            "icon_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_icon.png",
-            "ijin_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_ijin.png",
-            "ijin_unko_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_unko",
-            "horizontal_background_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_bg-pc.png",
-            "vertical_background_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_bg-sp.png",
-            "win_script": "偉人が勝ったときのセリフ",
-            "lose_script": "偉人が負けたときのセリフ",
-            "appearance_script": "<y>どう最近？</y>",
-            "unko_get_script": "うんこゲットセリフ",
-            "play_script": "プレイ中の偉人のセリフ",
-            "correct_script1": "正解時の偉人のセリフ1",
-            "correct_script2": "正解時の偉人のセリフ2",
-            "correct_script3": "正解時の偉人のセリフ3",
-            "incorrect_script1": "不正解時の偉人のセリフ1",
-            "incorrect_script2": "不正解時の偉人のセリフ2",
-            "incorrect_script3": "不正解時の偉人のセリフ3"
-          },
-          {
-            "short_name": "{釈,しゃ}{迦,く}_0",
-            "target_score": 139,
-            "thumbnail_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/thumbnail.png",
-            "icon_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/icon.png",
-            "ijin_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/",
-            "ijin_unko_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/unko_icon.png",
-            "horizontal_background_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/",
-            "vertical_background_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/",
-            "win_script": "偉人が勝ったときのセリフ",
-            "lose_script": "偉人が負けたときのセリフ",
-            "appearance_script": "偉人登場のセリフ",
-            "unko_get_script": "うんこゲットセリフ",
-            "play_script": "プレイ中の偉人のセリフ",
-            "correct_script1": "正解時の偉人のセリフ1",
-            "correct_script2": "正解時の偉人のセリフ2",
-            "correct_script3": "正解時の偉人のセリフ3",
-            "incorrect_script1": "不正解時の偉人のセリフ1",
-            "incorrect_script2": "不正解時の偉人のセリフ2",
-            "incorrect_script3": "不正解時の偉人のセリフ3"
-          },
-          {
-            "short_name": "{釈,しゃ}{迦,く}_0",
-            "target_score": 139,
-            "thumbnail_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/thumbnail.png",
-            "icon_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/icon.png",
-            "ijin_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/",
-            "ijin_unko_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/unko_icon.png",
-            "horizontal_background_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/",
-            "vertical_background_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/",
-            "win_script": "偉人が勝ったときのセリフ",
-            "lose_script": "偉人が負けたときのセリフ",
-            "appearance_script": "偉人登場のセリフ",
-            "unko_get_script": "うんこゲットセリフ",
-            "play_script": "プレイ中の偉人のセリフ",
-            "correct_script1": "正解時の偉人のセリフ1",
-            "correct_script2": "正解時の偉人のセリフ2",
-            "correct_script3": "正解時の偉人のセリフ3",
-            "incorrect_script1": "不正解時の偉人のセリフ1",
-            "incorrect_script2": "不正解時の偉人のセリフ2",
-            "incorrect_script3": "不正解時の偉人のセリフ3"
-          }
-        ]
+      "short_name": "ソクラテス_0",
+      "target_score": 123,
+      "thumbnail_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_thumbnail.png",
+      "icon_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_icon.png",
+      "ijin_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_ijin.png",
+      "ijin_unko_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_unko",
+      "horizontal_background_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_bg-pc.png",
+      "vertical_background_image_url": "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_bg-sp.png",
+      "win_script": "偉人が勝ったときのセリフ",
+      "lose_script": "偉人が負けたときのセリフ",
+      "appearance_script": "<y>どう最近？</y>",
+      "unko_get_script": "うんこゲットセリフ",
+      "play_script": "プレイ中の偉人のセリフ",
+      "correct_script1": "正解時の偉人のセリフ1",
+      "correct_script2": "正解時の偉人のセリフ2",
+      "correct_script3": "正解時の偉人のセリフ3",
+      "incorrect_script1": "不正解時の偉人のセリフ1",
+      "incorrect_script2": "不正解時の偉人のセリフ2",
+      "incorrect_script3": "不正解時の偉人のセリフ3"
     }
+  ]
+}

@@ -3163,6 +3163,9 @@
     "storyScreen": {
       "__id__": 60
     },
+    "charaUnkoSenseiPrefab": {
+      "__uuid__": "bc5c8457-36ec-473a-b91f-c20c788eeffd"
+    },
     "loadingBarNode": {
       "__id__": 67
     },
@@ -3183,9 +3186,6 @@
     },
     "btnPrefab": {
       "__uuid__": "d7d259d6-6913-4347-83c7-0ce2bb545b38"
-    },
-    "playerStatusBarPrefab": {
-      "__uuid__": "5689e8fb-7ca6-415e-9153-b125f3cb8097"
     },
     "finishScreenPrefab": {
       "__uuid__": "96f65a5e-ee43-41d2-841c-8764493841d1"

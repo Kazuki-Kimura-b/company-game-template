@@ -4,7 +4,7 @@ import SE from "../common/SE";
 import SystemIcon from "../common/SystemIcon";
 import FinishScreen, { FinishColor } from "../game/FinishScreen";
 import IjinScreen from "../game/IjinScreen";
-import VSScreen from "../game/VSScreen";
+import CharaUnkoSensei from "../opening/CharaUnkoSensei";
 import StaticData, { GameMode } from "../StaticData";
 import StoryScreen from "./StoryScreen";
 
@@ -22,6 +22,7 @@ export default class IntroductionMain extends cc.Component
     @property(IjinScreen) ijinScreen:IjinScreen = null;
     @property(cc.Sprite) bgSprtite:cc.Sprite = null;
     @property(StoryScreen) storyScreen:StoryScreen = null;
+    @property(cc.Prefab) charaUnkoSenseiPrefab:cc.Prefab = null;
     @property(cc.Node) loadingBarNode:cc.Node = null;
     @property(cc.Node) vsScreenParentNode:cc.Node = null;
     @property(cc.Node) finishScreenParentNode:cc.Node = null;
@@ -29,18 +30,15 @@ export default class IntroductionMain extends cc.Component
     @property({ type:cc.AudioClip }) bgmAudioClip:cc.AudioClip = null;
     @property(cc.Prefab) vsScreenPrefab:cc.Prefab = null;
     @property(cc.Prefab) btnPrefab:cc.Prefab = null;
-    @property(cc.Prefab) playerStatusBarPrefab:cc.Prefab = null;
     @property(cc.Prefab) finishScreenPrefab:cc.Prefab = null;
     @property(cc.Prefab) sceneLoadIndicator: cc.Prefab = null;
     @property(cc.Material) circleMaterial:cc.Material = null;
 
 
-    private _vsScreen:VSScreen = null;
+    private _sensei:CharaUnkoSensei = null;
     private _flgLoadedIjinImage:boolean = false;
     private _flgLoadedBgImage:boolean = false;
     private _finishScreen:FinishScreen = null;
-    private _gameSceneLoaded:boolean = false;       //事前読み込みが終わってる
-    private _standByGameScene:boolean = false;      //このシーンが終わったので読み込み完了待ち
 
     //--------------------------------------------------------------------------------------------------
     //
@@ -58,11 +56,21 @@ export default class IntroductionMain extends cc.Component
 
     start ()
     {
+        if (!StaticData.playerData) {
+            SchoolAPI.importGameSettings(() => {
+                this.gameStart();
+            });
+        }
+    }
 
-        this.ijinScreen.setup();
-        this.ijinScreen.hide();
-        this.ijinScreen.ijinScaleTo(IjinScreen.SCALE_STORY, 0);
-        this.ijinScreen.ijinMoveTo(cc.v2(0,IjinScreen.Y_STORY), 0);
+    private gameStart(): void {
+        let usNode: cc.Node = cc.instantiate(this.charaUnkoSenseiPrefab);
+        this._sensei = usNode.getComponent(CharaUnkoSensei);
+        this._sensei.setup();
+        // this.ijinScreen.setup();
+        // this.ijinScreen.hide();
+        // this.ijinScreen.ijinScaleTo(IjinScreen.SCALE_STORY, 0);
+        // this.ijinScreen.ijinMoveTo(cc.v2(0,IjinScreen.Y_STORY), 0);
 
         //ゲーム画面を事前読み込み
         this.loadingBarNode.active = false;     //ローディングバーは非表示にしておく
@@ -87,18 +95,8 @@ export default class IntroductionMain extends cc.Component
         this._finishScreen = fsNode.getComponent(FinishScreen);
         this._finishScreen.setupWithClose(FinishColor.YELLOW, FinishColor.YELLOW);
 
-        // 相手情報を取得し登録
-        cc.loader.loadRes("json/opponent", (err, res) => {
-            if (err) {
-                console.log("データを読み込めませんでした。");
-                return;
-            }
-            StaticData.opponentCPUs = res.json;
-            cc.log(StaticData.opponentCPUs);
-            cc.log(StaticData.ijinData);
-            this._loadMainIjinImage();
-            this._loadBgImage();
-        })
+        this._loadMainIjinImage();
+        this._loadBgImage();
     }
 
     /**

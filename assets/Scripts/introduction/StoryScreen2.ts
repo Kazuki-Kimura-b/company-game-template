@@ -1,12 +1,10 @@
 import AnsButton from "../answerComponents/AnsButton";
-import BugTracking from "../common/BugTracking";
 import SchoolText from "../common/SchoolText";
 import SE from "../common/SE";
 import STFont from "../common/STFont";
 import STFormat from "../common/STFormat";
 import TapEffect from "../common/TapEffect";
 import IjinScreen from "../game/IjinScreen";
-import StaticData from "../StaticData";
 
 const {ccclass, property} = cc._decorator;
 
@@ -21,10 +19,6 @@ export default class StoryScreen extends cc.Component
     @property(SchoolText) nameOutput:SchoolText = null;
     @property(cc.Node) nextIconNode:cc.Node = null;
     @property(cc.Sprite) effectIconSprite:cc.Sprite = null;
-    @property(cc.Button) btnSkip:cc.Button = null;
-    @property(cc.SpriteFrame) bikkuriSpriteFrame:cc.SpriteFrame = null;
-    @property(cc.SpriteFrame) guchaSpriteFrame:cc.SpriteFrame = null;
-    @property(cc.SpriteFrame) ikariSpriteFrame:cc.SpriteFrame = null;
     @property({type:cc.AudioClip}) talkPlayerSE:cc.AudioClip = null;
     @property({type:cc.AudioClip}) talkIjinSE:cc.AudioClip = null;
     @property(cc.Prefab) questionFontPrefab:cc.Prefab = null;			//問題と回答ボタンで使用するSTFont情報
@@ -72,7 +66,6 @@ export default class StoryScreen extends cc.Component
         this.messageWindow.active = false;
         this.nextIconNode.active = false;
         this.effectIconSprite.node.active = false;
-        this.btnSkip.node.active = StaticData.DEVELOP_MODE;     //デベロップモードだけスキップボタンを表示
 
         this._talkCharacter = -1;       //未設定
 
@@ -328,15 +321,15 @@ export default class StoryScreen extends cc.Component
     {
         if(message == null || message == undefined || message == "")
         {
-            BugTracking.notify("表示するメッセージが存在しない", "StoryScreen._rollMessage()",
-            {
-                msg:"表示するメッセージが存在しない",
-                isEmpty: message == "",
-                isNull: message == null,
-                isUndefined: message == undefined,
-                character: character,
-                message: message
-            });
+            // BugTracking.notify("表示するメッセージが存在しない", "StoryScreen._rollMessage()",
+            // {
+            //     msg:"表示するメッセージが存在しない",
+            //     isEmpty: message == "",
+            //     isNull: message == null,
+            //     isUndefined: message == undefined,
+            //     character: character,
+            //     message: message
+            // });
             
             return;
         }
@@ -397,41 +390,6 @@ export default class StoryScreen extends cc.Component
                 this._nextPage();
                 return;
             }
-            // //てんさいパワーが上昇/下降
-            // else if(func == "tensai_power")
-            // {
-            //     let changedPower:number = this._playerStatusBar.getPowerFromDisplay() + Number(datas[1]);
-            //     if(changedPower < 0) changedPower = 0;
-            //     this._playerStatusBar.storyTensaiPowerUpDown(changedPower, ()=>
-            //     {
-            //         this._nextPage();
-            //     });
-            //     return;
-            // }
-            // //コインを消費
-            // else if(func == "coin")
-            // {
-            //     let isLock:boolean = this._playerStatusBar.isLockSkipButton();
-            //     this._playerStatusBar.lockSkipButton(true);
-                
-            //     let changedCoin:number = this._playerStatusBar.getCoinFromDisplay() + Number(datas[1]);
-            //     if(changedCoin < 0) changedCoin = 0;
-            //     this._playerStatusBar.storyCoinUpDown(changedCoin, ()=>
-            //     {
-            //         this._playerStatusBar.lockSkipButton(isLock);
-            //         this._nextPage();
-            //     });
-            //     return;
-            // }
-            /*
-            //ステータスを中央に表示
-            else if(func == "StatusDefaultY")
-            {
-                this._playerStatusBar.toScrollContentsDefaultY(0.5);
-                this._onTouchBegan(null);
-                return;
-            }
-            */
             //偉人がカットイン
             else if(func == "cutin")
             {
@@ -674,7 +632,6 @@ export default class StoryScreen extends cc.Component
         {
             this.messageOutput.setText("");
             this.nameOutput.node.parent.active = false;
-            this.btnSkip.node.active = false;
 
             //偉人が表示されてない場合があるので表示する
             this._ijinScreen.show();

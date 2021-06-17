@@ -1,4 +1,3 @@
-import { callbackify } from "node:util";
 import StaticData from "../StaticData";
 import APIAccess from "./APIAccess"
 import APIErrorPopup, { APIErrorType } from "./APIErrorPopup";
@@ -885,11 +884,6 @@ export default class SchoolAPI extends APIAccess
      */
     public static ghostModeFlag(callback:(response:any)=>void):void
     {
-        if(this._DUMMY_DATA_MODE || StaticData.ghostAlwayMode)
-        {
-            this._dummyDataGhostFlag(callback);
-            return;
-        }
 
         this._aliveTokenCheck();        //トークンがあるか確認
         this._startAccessIcon();        //アイコンの表示
@@ -1928,14 +1922,6 @@ export default class SchoolAPI extends APIAccess
     }
 
 
-
-    private static _dummyDataGhostFlag(callback:(response:any)=>void):void
-    {
-        if(StaticData.ghostAlwayMode) callback({ ghost_mode_flag: true });
-        else callback({ ghost_mode_flag: false });
-    }
-
-
     private static _dummyGetGameItems(callback:(response:GetGameItem)=>void):void
     {
         callback(new GetGameItem(123,
@@ -2000,7 +1986,253 @@ export default class SchoolAPI extends APIAccess
             ));
     }
 
-    
-    
+    /**
+     * 企業タイアップゲーム開始用エンドポイント
+     * @param callback コールバック
+     * @param gameMode 各企業の名前を指定する
+     * @param reference どこからのアクセスかを入れる
+     */
+    public static exStart(gameMode:string, reference: string, callback:(response:any)=>void):void
+    {
+        if (!StaticData.testMode) {
+            this._aliveTokenCheck();        //トークンがあるか確認
+            this._startAccessIcon();        //アイコンの表示
+            
+            let xhr:XMLHttpRequest = new XMLHttpRequest();
+            let url:string = this.staticGetHost() + "​​/api/v1/external_study/start";
 
+            xhr.open( 'POST', url, true );
+            // POST 送信の場合は Content-Type は固定.
+            xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+            xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
+            xhr.timeout = SchoolAPI.TIME_OUT;
+
+            xhr.onload = (ev:ProgressEvent<EventTarget>)=>
+            {
+                this._closeAccessIcon();        //アイコンを消す
+                
+                cc.log(xhr.status);
+                
+                let response = null;
+
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200)
+                {
+                    let responseText:string = xhr.responseText;
+                    response = JSON.parse(responseText);
+
+                    cc.log("EX GAME START RESPONSE --------------");
+                    cc.log(response);
+
+                    cc.log("RequestToken:" + response.token);
+
+                    if(response == null)
+                    {
+                        //エラーポップアップを表示し、リロードしてもらう
+                        this._errorPopup(APIErrorType.FAILED_CLOSE, ()=>{});
+                    }
+                    else
+                    {
+                        //問題なし
+                        callback(response);
+                    }
+                }
+                else
+                {
+                    //エラーポップアップを表示し、リロードしてもらう
+                    this._errorPopup(APIErrorType.FAILED_CLOSE, ()=>{});
+                }
+            };
+            xhr.onerror = xhr.ontimeout = (ev:ProgressEvent<EventTarget>)=>
+            {
+                this._closeAccessIcon();        //アイコンを消す
+                
+                //再接続
+                this._errorPopup(APIErrorType.OFFLINE, ()=>
+                {
+                    this.exStart(gameMode, reference, callback);
+                });
+                //console.error(xhr.statusText);
+            };
+            // xhr.send('mode=' + gameMode);
+            xhr.send(`mode=${gameMode}&rf=${reference}`);
+        } else {
+            // テストモード
+            let response: any = {
+                script_start1: "まけないよ〜！",
+                script_start2: "いくで〜！！！！",
+                script_start3: "よっしゃ、やるで〜！",
+                script_twenty_sec: "まだ20{秒,びょう}もあるよ！",
+                script_ten_sec: "あと10{秒,びょう}！",
+                script_five_sec: "あと5{秒,びょう}！",
+                script_end1: "FINISH!!",
+                script_end2: "ぜんぜんダメだった。",
+                script_end3: "しゅ〜りょ〜！",
+                token: null
+            }
+            callback(response);
+        }
+    }
+
+    /**
+     * 企業タイアップ回答登録用エンドポイント
+     * @param callback コールバック
+     * @param gameMode 各企業の名前を指定する
+     * @param reference どこからのアクセスかを入れる
+     */
+     public static exResult(answers:{question_id:string, answer:string, correct_answer: string, required_time:number, hint:boolean}[], requestToken: string, callback:(response:any)=>void):void
+     {
+         this._aliveTokenCheck();        //トークンがあるか確認
+         this._startAccessIcon();        //アイコンの表示
+         
+         let xhr:XMLHttpRequest = new XMLHttpRequest();
+         let url:string = this.staticGetHost() + "​​/api/v1/external_study/question";
+ 
+         xhr.open( 'POST', url, true );
+         // POST 送信の場合は Content-Type は固定.
+         xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+         xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
+         xhr.timeout = SchoolAPI.TIME_OUT;
+ 
+         xhr.onload = (ev:ProgressEvent<EventTarget>)=>
+         {
+             this._closeAccessIcon();        //アイコンを消す
+             
+             cc.log(xhr.status);
+             
+             let response = null;
+ 
+             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200)
+             {
+                 let responseText:string = xhr.responseText;
+                 response = JSON.parse(responseText);
+ 
+                 cc.log("EX RESULT REGISTER --------------");
+                 cc.log(response);
+ 
+                 cc.log("RequestToken:" + response.token);
+ 
+                 if(response == null)
+                 {
+                     //エラーポップアップを表示し、リロードしてもらう
+                     this._errorPopup(APIErrorType.FAILED_CLOSE, ()=>{});
+                 }
+                 else
+                 {
+                     //問題なし
+                     callback(response);
+                 }
+             }
+             else
+             {
+                 //エラーポップアップを表示し、リロードしてもらう
+                 this._errorPopup(APIErrorType.FAILED_CLOSE, ()=>{});
+             }
+         };
+         xhr.onerror = xhr.ontimeout = (ev:ProgressEvent<EventTarget>)=>
+         {
+             this._closeAccessIcon();        //アイコンを消す
+             
+             //再接続
+             this._errorPopup(APIErrorType.OFFLINE, ()=>
+             {
+                 this.exResult(answers, requestToken, callback);
+             });
+             //console.error(xhr.statusText);
+         };
+         let json =
+         {
+             token: requestToken,
+             answers: answers
+         }
+         xhr.send(JSON.stringify(json));
+     }
+    
+    /**
+     * 企業タイアップゲーム終了用エンドポイント
+     * @param callback コールバック
+     * @param gameMode 各企業の名前を指定する
+     * @param reference どこからのアクセスかを入れる
+     */
+     public static exEnd(requestToken: string, callback:(response:any)=>void):void
+     {
+         this._aliveTokenCheck();        //トークンがあるか確認
+         this._startAccessIcon();        //アイコンの表示
+         
+         let xhr:XMLHttpRequest = new XMLHttpRequest();
+         let url:string = this.staticGetHost() + "​​/api/v1/external_study/end";
+ 
+         xhr.open( 'POST', url, true );
+         // POST 送信の場合は Content-Type は固定.
+         xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+         xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
+         xhr.timeout = SchoolAPI.TIME_OUT;
+ 
+         xhr.onload = (ev:ProgressEvent<EventTarget>)=>
+         {
+             this._closeAccessIcon();        //アイコンを消す
+             
+             cc.log(xhr.status);
+             
+             let response = null;
+ 
+             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200)
+             {
+                 let responseText:string = xhr.responseText;
+                 response = JSON.parse(responseText);
+ 
+                 cc.log("EX RESULT REGISTER --------------");
+                 cc.log(response);
+ 
+                 cc.log("RequestToken:" + response.token);
+ 
+                 if(response == null)
+                 {
+                     //エラーポップアップを表示し、リロードしてもらう
+                     this._errorPopup(APIErrorType.FAILED_CLOSE, ()=>{});
+                 }
+                 else
+                 {
+                     //問題なし
+                     callback(response);
+                 }
+             }
+             else
+             {
+                 //エラーポップアップを表示し、リロードしてもらう
+                 this._errorPopup(APIErrorType.FAILED_CLOSE, ()=>{});
+             }
+         };
+         xhr.onerror = xhr.ontimeout = (ev:ProgressEvent<EventTarget>)=>
+         {
+             this._closeAccessIcon();        //アイコンを消す
+             
+             //再接続
+             this._errorPopup(APIErrorType.OFFLINE, ()=>
+             {
+                 this.exEnd(requestToken, callback);
+             });
+             //console.error(xhr.statusText);
+         };
+         xhr.send(`token=${requestToken}`);
+     }
+
+     public static importGameSettings(callback:()=>void): void {
+        //  jsonの読み込み
+        cc.loader.loadRes("json/setting", (err, res) => {
+            if (err) {
+                cc.log("settingを読み込めませんでした");
+                return;
+            }
+            StaticData.playerData = res.json.playerData;
+            StaticData.gameSetting = res.json.setting;
+            cc.loader.loadRes("json/opponent", (err, res) => {
+                if (err) {
+                    cc.log("opponentを読み込めませんでした");
+                    return;
+                }
+                StaticData.opponentCPUs = res.json;
+                callback();
+            })
+        });
+     }
 }

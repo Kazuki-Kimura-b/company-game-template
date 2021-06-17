@@ -1,5 +1,7 @@
 import APIAccess from "./common/APIAccess";
-import { CPUData, NavigatorConversations, OpponentCPU, PlayerData } from "./common/Models";
+import { CPUData, NavigatorConversations, OpponentCPU } from "./common/Models";
+import {PlayerData} from "./common/Models"
+import { GameSE } from "./game/GameSEComponent";
 
 const {ccclass, property} = cc._decorator;
 
@@ -10,7 +12,7 @@ export enum GameMode
     HAYABEN,
     GHOST,
     GACHIBEN,
-    KAKUNIN_TEST
+    KAKUNIN_TEST,
 }
 
 export enum SpecialEvent
@@ -24,13 +26,24 @@ export enum SpecialEvent
     HAYABEN_END
 }
 
+interface GameSetting {
+    companyName: string, // 企業名
+    isRandomQuestion: boolean, // ランダムで出題するかどうか
+    allQuestionNum: number, // 全問題数(出題数は10問で固定する)
+    isTestMode: boolean, // 確認モードかどうか。確認モードの場合、クエリで設定をつけていく
+    showSpecificQuestion: boolean, // 特定の問題を出題するかどうか
+    specificQuestionNum: number, // 特定の問題のID
+    showSpecificResult: boolean, // 特定の結果画面を出題する場合
+    specificResultNum: number, // 特定の結果画面のID,
+}
+
 
 
 @ccclass
 export default class StaticData {
 
-    public static readonly DEVELOP_MODE:boolean = APIAccess.isDevelopToken();
-    public static readonly LOCAL_HOST:boolean = (location.hostname == "localhost");
+    public static readonly DEVELOP_MODE:boolean = APIAccess.isDevelopToken(); // 使わない
+    public static readonly LOCAL_HOST:boolean = (location.hostname == "localhost"); // 使わない
     
     /** タイトル画面で最初のAPIを叩いたかどうか */
     public static titleSceneStartAPI :boolean = false;
@@ -43,9 +56,6 @@ export default class StaticData {
 
     /** 問題データを分割する単語 */
     public static readonly QUESTION_SPLIT_WORD :string = ";";
-
-    /** ローカルのダミーデータは問題数多いのを使う */
-    public static readonly LOCAL_Q_DATA_BIG :boolean = true;
 
     /** 問題idを表示 */
     //public static readonly DEBUG_SHOW_QUESTION_ID: boolean = false;
@@ -66,18 +76,6 @@ export default class StaticData {
 
     //-------------------------------------------------------------
 
-    /** プレビューモードかどうか */
-    public static previewMode :boolean = false;
-
-    /** Opening_Bシーンで展開するイベント内容 */
-    public static specialEvent: SpecialEvent = SpecialEvent.NONE;
-
-    /** ゴースト発生確率が100%になる */
-    public static ghostAlwayMode: boolean = false;
-
-    /** 対戦相手がソクラテスになる */
-    public static vsSokuratesu: boolean = false;
-
     /** ゴーストに勝利したかどうか（最後に対戦したもの） */
     public static ghostWin:boolean = false;
     /** 対戦したゴーストの日付 */
@@ -91,7 +89,7 @@ export default class StaticData {
 
 
     /** ユーザーのゲーム的な情報 */
-    public static playerData:PlayerData = null;
+    // public static playerData:PlayerData = null;
 
     /** 戦う偉人の情報 */
     private static _opponentCPUs:OpponentCPU = null;
@@ -113,9 +111,8 @@ export default class StaticData {
     }
 
     
-    /** ゲームモード。*/
+    /** ゲームモード。こちらはゼミで使用しているのであとで削除する*/
     public static gameModeID: GameMode = GameMode.KAKUNIN_TEST;
-
 
     /** ゴリ勉(イントロダクション)で使用したアイテム */
     public static useItemIDs:number[] = [];
@@ -134,44 +131,18 @@ export default class StaticData {
     /** 最後に表示した（しようとした）問題ID */
     public static lastQuestionID:string = "";
 
-}
 
+    // ---------- 企業タイアップゲーム用設定 ---------
+    /** 各企業のゲームモード */
+    public static companyGameMode: string = null;
 
+    /** どこからのアクセスかを記録 */
+    public static reference: string = null;
 
+    /** テスト環境かどうかのフラグ */
+    public static testMode: boolean = true;
 
+    public static playerData: PlayerData = null;
 
-export class EasingName
-{
-    public static quadIn        :string = 'quadIn';
-    public static quadOut       :string = 'quadOut';
-    public static quadInOut     :string = 'quadInOut';
-    public static cubicIn       :string = 'cubicIn';
-    public static cubicOut      :string = 'cubicOut';
-    public static cubicInOut    :string = 'cubicInOut';
-    public static quartIn       :string = 'quartIn';
-    public static quartOut      :string = 'quartOut';
-    public static quartInOut    :string = 'quartInOut';
-    public static quintIn       :string = 'quintIn';
-    public static quintOut      :string = 'quintOut';
-    public static quintInOut    :string = 'quintInOut';
-    public static sineIn        :string = 'sineIn';
-    public static sineOut       :string = 'sineOut';
-    public static sineInOut     :string = 'sineInOut';
-    public static expoIn        :string = 'expoIn';
-    public static expoOut       :string = 'expoOut';
-    public static expoInOut     :string = 'expoInOut';
-    public static circIn        :string = 'circIn';
-    public static circOut       :string = 'circOut';
-    public static circInOut     :string = 'circInOut';
-    public static elasticIn     :string = 'elasticIn';
-    public static elasticOut    :string = 'elasticOut';
-    public static elasticInOut  :string = 'elasticInOut';
-    public static backIn        :string = 'backIn';
-    public static backOut       :string = 'backOut';
-    public static backInOut     :string = 'backInOut';
-    public static bounceIn      :string = 'bounceIn';
-    public static bounceOut     :string = 'bounceOut';
-    public static bounceInOut   :string = 'bounceInOut';
-    public static smooth        :string = 'smooth';
-    public static fade          :string = 'fade';
+    public static gameSetting: GameSetting = null;
 }
