@@ -1,0 +1,11 @@
+{
+    "script": [
+        "<y>こ、ここは…？</y>",
+        "<i>よく{来,き}たのぅ…</i>",
+        "<callback,faceChange,warui>",
+        "<callback,senseiFadeIn,stop>",
+        "<i>…</i>",
+        "<callback,faceChange,tere>",
+        "<i>どう最近？</i>"
+    ]
+}

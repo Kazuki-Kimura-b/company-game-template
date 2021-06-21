@@ -1,4 +1,5 @@
 import BugTracking from "../common/BugTracking";
+import NegaEffector from "../common/NegaEffector";
 import SchoolAPI from "../common/SchoolAPI";
 import SE from "../common/SE";
 import SystemIcon from "../common/SystemIcon";
@@ -19,58 +20,37 @@ export default class IntroductionMain extends cc.Component
     @property(cc.Node) contentsNode:cc.Node = null;
     @property(cc.Node) markU:cc.Node = null;
     @property(cc.Node) markR:cc.Node = null;
-    @property(IjinScreen) ijinScreen:IjinScreen = null;
-    @property(cc.Sprite) bgSprtite:cc.Sprite = null;
-    @property(StoryScreen) storyScreen:StoryScreen = null;
+    @property(cc.Node) unkoSenseiParentNode = null;
     @property(cc.Prefab) charaUnkoSenseiPrefab:cc.Prefab = null;
+    @property(cc.Node) bgParentNode: cc.Node = null;
+    @property(cc.Prefab) bgPrefab: cc.Prefab = null;
+    @property(StoryScreen) storyScreen:StoryScreen = null;
     @property(cc.Node) loadingBarNode:cc.Node = null;
-    @property(cc.Node) vsScreenParentNode:cc.Node = null;
     @property(cc.Node) finishScreenParentNode:cc.Node = null;
     @property({ type:cc.AudioClip }) seWarp:cc.AudioClip = null;
     @property({ type:cc.AudioClip }) bgmAudioClip:cc.AudioClip = null;
-    @property(cc.Prefab) vsScreenPrefab:cc.Prefab = null;
-    @property(cc.Prefab) btnPrefab:cc.Prefab = null;
+    @property({ type:cc.AudioClip }) seShock:cc.AudioClip = null;
     @property(cc.Prefab) finishScreenPrefab:cc.Prefab = null;
     @property(cc.Prefab) sceneLoadIndicator: cc.Prefab = null;
     @property(cc.Material) circleMaterial:cc.Material = null;
 
 
     private _sensei:CharaUnkoSensei = null;
-    private _flgLoadedIjinImage:boolean = false;
-    private _flgLoadedBgImage:boolean = false;
+    private _negaEffector: NegaEffector = null;
     private _finishScreen:FinishScreen = null;
 
-    //--------------------------------------------------------------------------------------------------
-    //
-    // ストーリーの開始、画面タップでストーリー進む。全部終わるとVS画面になる
-    //
-    //　・画像読み込み、ストーリーの取得　←　ここでやる
-    //
-    //　・ストーリー表示　←　ストーリー再生プレハブに任せる（クイズ結果で再利用するためプレハブにして切り離す）
-    //
-    //　・ＶＳ画面表示　←　ここでやる
-    //
-    //--------------------------------------------------------------------------------------------------
-
-    
 
     start ()
     {
-        if (!StaticData.playerData) {
-            SchoolAPI.importGameSettings(() => {
-                this.gameStart();
-            });
-        }
-    }
-
-    private gameStart(): void {
+        // 背景を読み込み
+        let bgNode: cc.Node = cc.instantiate(this.bgPrefab);
+        this.bgParentNode.addChild(bgNode);
+        
+        // うんこ先生を読み込み
         let usNode: cc.Node = cc.instantiate(this.charaUnkoSenseiPrefab);
+        this.unkoSenseiParentNode.addChild(usNode);
         this._sensei = usNode.getComponent(CharaUnkoSensei);
         this._sensei.setup();
-        // this.ijinScreen.setup();
-        // this.ijinScreen.hide();
-        // this.ijinScreen.ijinScaleTo(IjinScreen.SCALE_STORY, 0);
-        // this.ijinScreen.ijinMoveTo(cc.v2(0,IjinScreen.Y_STORY), 0);
 
         //ゲーム画面を事前読み込み
         this.loadingBarNode.active = false;     //ローディングバーは非表示にしておく
@@ -87,7 +67,63 @@ export default class IntroductionMain extends cc.Component
             }
         );
 
-        this.storyScreen.setup(this.ijinScreen, this.canvas.node);
+        this.storyScreen.setup(this._sensei, this.canvas.node);
+
+        //暗転シェーダー
+        this._negaEffector = this.getComponent(NegaEffector);
+        this._negaEffector.canvasNode = this.canvas.node;
+
+        // エフェクトを追加
+        this.storyScreen.onStoryCommonCallback((code:string, subCode:string)=>
+        {
+            // 先生が真っ黒からフェードインで入ってくる
+            if(code == "senseiFadeIn")
+            {
+                this._sensei.toColor(1.0, cc.color(255,255,255), ()=>
+                {
+                    this.storyScreen.resumeNextPage();
+                });
+            }
+            // 先生の顔の画像を変更
+            else if(code == "faceChange")
+            {
+                this._sensei.faceChange(subCode);
+                this._sensei.unazuki();
+            }
+            // 先生の体の画像を変更
+            else if(code == "bodyChange")
+            {
+                this._sensei.bodyChange(subCode);
+            }
+            // 先生、うなづく
+            else if(code == "unazuki")
+            {
+                this._sensei.unazuki();
+            }
+            // 先生に指定のエフェクトを表示
+            else if(code == "effect")
+            {
+                this._sensei.effect(subCode);
+            }
+            // 先生の表示・非表示
+            else if(code == "senseiVisible")
+            {
+                this._sensei.node.active = (subCode == "TRUE");
+            }
+            // 先生をスケール0で非表示にする
+            else if(code == "senseiScale0")
+            {
+                this._sensei.node.scale = 0;
+            }
+            // ガーンエフェクト
+            else if(code == "negaEffect")
+            {
+                this._negaEffect(()=>
+                {
+                    this.storyScreen.resumeNextPage();
+                });
+            }
+        });
 
         //フィニッシュスクリーンをセット
         let fsNode:cc.Node = cc.instantiate(this.finishScreenPrefab);
@@ -95,90 +131,87 @@ export default class IntroductionMain extends cc.Component
         this._finishScreen = fsNode.getComponent(FinishScreen);
         this._finishScreen.setupWithClose(FinishColor.YELLOW, FinishColor.YELLOW);
 
-        this._loadMainIjinImage();
-        this._loadBgImage();
+
+        if (!StaticData.playerData) {
+            SchoolAPI.importGameSettings(() => {
+                this._showStory();
+            });
+        } else {
+            this._showStory();
+        }
+    }
+
+    private _negaEffect(callback:()=>void):void
+    {
+        //色反転
+		this._negaEffector.setNega();
+
+        SE.play(this.seShock);
+
+        cc.tween({})
+        .delay(1.2)
+        .call(()=>
+        {
+            this._negaEffector.setDefault();
+            callback();
+        })
+        .start();
     }
 
     /**
-     * 偉人の画像を読み込む
+     * ストーリーの開始
      */
-    private _loadMainIjinImage():void
+     private _showStory():void
     {
-        this._loadImage("ijin_image", StaticData.ijinData.ijin_image_url, (image:cc.SpriteFrame)=>
-        {
-            cc.log(StaticData.ijinData.ijin_image_url);
-            if(image == null)//読み込み失敗
-            {
-                BugTracking.notify("偉人画像の読み込みに失敗", "IntroductionMain._loadMainIjinImage()",
-                {
-                    msg:"偉人画像の読み込みに失敗\n" + StaticData.ijinData.ijin_image_url,
-                    url:StaticData.ijinData.ijin_image_url,
-                    ijinData:StaticData.ijinData
-                });
-                return;
-            }
-
-            StaticData.ijinData.ijinImageSpriteFrame = image;
-
-            this._flgLoadedIjinImage = true;
-            this._checkLoadedIjinAndBG();
-        });
-    }
-
-
-    /**
-     * 背景を読み込む
-     */
-    private _loadBgImage():void
-    {
-        this._loadImage("bg_image", StaticData.ijinData.vertical_background_image_url, (image:cc.SpriteFrame)=>
-        {
-            if(image == null)//読み込み失敗
-            {
-                BugTracking.notify("背景画像の読み込みに失敗", "IntroductionMain._loadBgImage()",
-                {
-                    msg:"背景画像の読み込みに失敗\n" + StaticData.ijinData.vertical_background_image_url,
-                    url:StaticData.ijinData.vertical_background_image_url,
-                    ijinData:StaticData.ijinData
-                });
-                return;
-            }
-
-            StaticData.ijinData.verticalBGSpriteFrame = image;
-
-            this._flgLoadedBgImage = true;
-            this._checkLoadedIjinAndBG();
-        });
-    }
-
-
-    private _checkLoadedIjinAndBG()
-    {
-        //まだ片方が読み込めてない
-        if(! this._flgLoadedIjinImage || ! this._flgLoadedBgImage) return;
-        
-        //偉人と背景のグラフィックを表示
-        this.ijinScreen.setIjinImage(StaticData.ijinData.ijinImageSpriteFrame);
-        this.bgSprtite.spriteFrame = StaticData.ijinData.verticalBGSpriteFrame;
-
-        //フィニッシュスクリーン（開始用）がはける
+        // フィニッシュスクリーン（開始用）がはける
         this._finishScreen.endFinishAction(()=>
         {
-            
         });
 
-        //タイムマシーンの表示
-        cc.tween({}).delay(1.5).call(()=>{ SE.play(this.seWarp); }).start();
-        
-        this._showTimeMachine(()=>
-        {
-            //BGMの開始
-            SE.bgmStart(this.bgmAudioClip);
-            //ストーリーの開始
-            this._showStory();
+        // セリフの読み込み
+        cc.loader.loadRes("json/introductionScript", (err, res) => {
+            if (err) {
+                "セリフの読み込みに失敗しました";
+                return;
+            }
+            let script: string;
+            res.json.script.forEach(line => {
+                script += line;
+            });
+            // 少し待ってから開始
+            cc.tween({})
+            .delay(0.5)
+            .call(()=>
+            {
+                this.storyScreen.setupStory("うんこ{先生,せんせい}", script);
+                this.storyScreen.onComplete(()=>
+                {
+                    this._endIntroduction();
+                });
+                this.storyScreen.startStory();
+            })
+            .start();
         });
-        
     }
+
+    /**
+     * 会話を終了し、ゲーム画面へ
+     */
+     private _endIntroduction():void
+     {
+         SE.bgmStop();
+
+         //挑戦か修行を選択
+         StaticData.gameModeID = GameMode.HAYABEN;
+         this._finishScreen.setupAtGameMode(StaticData.gameModeID);
+         this._finishScreen.finishShow(()=>
+         {
+             this.loadingBarNode.active = true;      //ロードバーを出す
+             SystemIcon.create(this.sceneLoadIndicator);     //読み込み中アイコン
+             cc.director.loadScene("game");
+         });
+         // });
+     }
 
 
     //タイムマシーンの演出開始
@@ -204,78 +237,5 @@ export default class IntroductionMain extends cc.Component
         .start();
     }
 
-
-
-
-    /**
-     * 画像を読み込む
-     */
-    private _loadImage(key:string, url:string, callback:(image:cc.SpriteFrame)=>void):void
-    {
-        SchoolAPI.loadImage(key, url, (response:any)=>
-        {
-            if(response.error != null) callback(null); 
-            else callback(response.image);
-        });
-    }
-
-
-    /**
-     * ストーリーの開始
-     */
-    private _showStory():void
-    {
-        let script:string = StaticData.ijinData.appearance_script;
-
-        //----
-
-        //少し待ってから開始
-        cc.tween({})
-        .delay(0.5)
-        .call(()=>
-        {
-            //ストーリーを開始する
-            this.storyScreen.setupStory(StaticData.ijinData.short_name, script);
-            this.storyScreen.onComplete(()=>
-            {
-                26
-                this._endIntroduction();
-            });
-
-            this.storyScreen.startStory();
-        })
-        .start();
-    }
-
-
-
-    
-
-    /**
-     * 会話を終了し、ゲーム画面へ
-     */
-    private _endIntroduction():void
-    {
-        SE.bgmStop();
-        // let vsNode:cc.Node = cc.instantiate(this.vsScreenPrefab);
-        // this.vsScreenParentNode.addChild(vsNode);
-
-        // this._vsScreen = vsNode.getComponent(VSScreen);
-
-        // this._vsScreen.setCanvasAndCamera(this.canvas, this.mainCamera);
-        // this._vsScreen.showVS(this.canvas.node, this.ijinScreen, this._finishScreen.node, (itemIDs:number[], code:string)=>
-        // {
-        
-        //挑戦か修行を選択
-        StaticData.gameModeID = GameMode.HAYABEN;
-        this._finishScreen.setupAtGameMode(StaticData.gameModeID);
-        this._finishScreen.finishShow(()=>
-        {
-            this.loadingBarNode.active = true;      //ロードバーを出す
-            SystemIcon.create(this.sceneLoadIndicator);     //読み込み中アイコン
-            cc.director.loadScene("game");
-        });
-        // });
-    }
     // update (dt) {}
 }

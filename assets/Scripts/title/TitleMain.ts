@@ -20,12 +20,9 @@ export default class TitleMain extends cc.Component {
     @property(cc.Node) markR: cc.Node = null;
     @property(cc.Node) markU: cc.Node = null;
     @property(cc.Node) loadingBar: cc.Node = null;
-    @property(cc.SpriteFrame) playerIcon = null;
+    @property(cc.Node) startButton: cc.Node = null;
     @property({type:cc.AudioClip}) seStartButton:cc.AudioClip = null;
     @property({type:cc.AudioClip}) seShowAnswerButton:cc.AudioClip = null;  //ここでは使わない。ボタン初期化のため
-
-
-
 
     private _sceneChanger :SceneChanger = null;
 
@@ -34,12 +31,25 @@ export default class TitleMain extends cc.Component {
      */
     start ()
     {
+        this.startButton.active = false;
         SchoolAPI.importGameSettings(() => {
-            this.gameStart();
+            this.startButton.active = true;
         });
-    }
 
-    gameStart(): void {
+        // シーンを事前に読み込む
+        cc.director.preloadScene("introduction",
+            //ロード中
+            (completeCount:number, totalCount:number, item:any)=>
+            {
+                this.loadingBar.scaleX = completeCount / totalCount;
+            },
+            //ロード完了
+            (error:Error)=>
+            {
+                if(this.loadingBar) this.loadingBar.scaleY = 0;
+            }
+        );
+
         if (StaticData.testMode) {
             // テストモード
             let query =  window.location.search;
@@ -103,12 +113,7 @@ export default class TitleMain extends cc.Component {
         this.loadingBar.active = true;
         this.loadingBar.scaleX = 0;
 
-        //読み込むシーン名
-        let loadSceneName:string = "introduction";
-
-        //初回なら次は絶対ゲーム画面なのでonLoadの中で実行しといた方がよい。
-        //2回目以降はメニューを読み込むのが良い
-        cc.director.preloadScene(loadSceneName,
+        cc.director.preloadScene("introduction",
             //ロード中
             (completeCount:number, totalCount:number, item:any)=>
             {
@@ -118,12 +123,10 @@ export default class TitleMain extends cc.Component {
             (error:Error)=>
             {
                 this.loadingBar.active = false;
-                //フェードアウト (このsceneChangerがnullになる可能性？ #132)
+
                 this._sceneChanger.sceneEnd(event, ()=>
                 {
-                    //ステージ選択画面へ
-                    //cc.director.loadScene("menu");
-                    cc.director.loadScene(loadSceneName);
+                    cc.director.loadScene("introduction");
                 });
 
             }

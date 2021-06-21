@@ -188,9 +188,7 @@ export default class StoryScreen extends cc.Component
 
         //有効なエフェクトタグ
         let effectTags:string[] = [
-            "ijin_buruburu", "ijin_bikkuri", "cutin", "cutout", "show_status", "hide_status", "reset_status", "set_coin",
-            "tensai_power", "coin", "select", "ijin_color", "ijin_big", "ijin_small", "ijin_ikari", "callback" ];
-        
+            "ijin_buruburu", "ijin_bikkuri", "cutin", "cutout", "coin", "select", "ijin_color", "ijin_big", "ijin_small", "ijin_ikari", "callback"];
 
         while(index < script.length)
         {
@@ -328,16 +326,7 @@ export default class StoryScreen extends cc.Component
     {
         if(message == null || message == undefined || message == "")
         {
-            BugTracking.notify("表示するメッセージが存在しない", "StoryScreen._rollMessage()",
-            {
-                msg:"表示するメッセージが存在しない",
-                isEmpty: message == "",
-                isNull: message == null,
-                isUndefined: message == undefined,
-                character: character,
-                message: message
-            });
-            
+            cc.log("表示するメッセージがないよ");
             return;
         }
         
@@ -373,65 +362,6 @@ export default class StoryScreen extends cc.Component
                 this._showSelectButtons(datas[1], datas[2]);
                 return;
             }
-            //ステータスを表示
-            else if(func == "show_status")
-            {
-                this._nextPage();
-                return;
-            }
-            //ステータスを非表示
-            else if(func == "hide_status")
-            {
-                this._nextPage();
-                return;
-            }
-            //ステータスを全て0に
-            else if(func == "reset_status")
-            {
-                this._nextPage();
-                return;
-            }
-            //コインを設定
-            else if(func == "set_coin")
-            {
-                this._nextPage();
-                return;
-            }
-            // //てんさいパワーが上昇/下降
-            // else if(func == "tensai_power")
-            // {
-            //     let changedPower:number = this._playerStatusBar.getPowerFromDisplay() + Number(datas[1]);
-            //     if(changedPower < 0) changedPower = 0;
-            //     this._playerStatusBar.storyTensaiPowerUpDown(changedPower, ()=>
-            //     {
-            //         this._nextPage();
-            //     });
-            //     return;
-            // }
-            // //コインを消費
-            // else if(func == "coin")
-            // {
-            //     let isLock:boolean = this._playerStatusBar.isLockSkipButton();
-            //     this._playerStatusBar.lockSkipButton(true);
-                
-            //     let changedCoin:number = this._playerStatusBar.getCoinFromDisplay() + Number(datas[1]);
-            //     if(changedCoin < 0) changedCoin = 0;
-            //     this._playerStatusBar.storyCoinUpDown(changedCoin, ()=>
-            //     {
-            //         this._playerStatusBar.lockSkipButton(isLock);
-            //         this._nextPage();
-            //     });
-            //     return;
-            // }
-            /*
-            //ステータスを中央に表示
-            else if(func == "StatusDefaultY")
-            {
-                this._playerStatusBar.toScrollContentsDefaultY(0.5);
-                this._onTouchBegan(null);
-                return;
-            }
-            */
             //偉人がカットイン
             else if(func == "cutin")
             {
