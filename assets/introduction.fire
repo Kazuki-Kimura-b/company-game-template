@@ -328,7 +328,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "backgroundParentNode",
+    "_name": "bgParentNode",
     "_objFlags": 0,
     "_parent": {
       "__id__": 5
@@ -2703,11 +2703,17 @@
     "unkoSenseiParentNode": {
       "__id__": 10
     },
-    "storyScreen": {
-      "__id__": 50
-    },
     "charaUnkoSenseiPrefab": {
       "__uuid__": "bc5c8457-36ec-473a-b91f-c20c788eeffd"
+    },
+    "bgParentNode": {
+      "__id__": 6
+    },
+    "bgPrefab": {
+      "__uuid__": "d892088c-4d57-4cfd-86e4-7645503e41f2"
+    },
+    "storyScreen": {
+      "__id__": 50
     },
     "loadingBarNode": {
       "__id__": 55

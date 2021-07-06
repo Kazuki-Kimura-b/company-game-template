@@ -477,7 +477,7 @@
       "ctor": "Float64Array",
       "array": [
         0,
-        -92,
+        0,
         0,
         0,
         0,
@@ -517,10 +517,10 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "bafde361-d38c-4b5e-87d2-57fd1df9ce39"
+      "__uuid__": "54cbd6f0-0fb7-4791-9a6c-f64811909b89"
     },
     "_type": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",

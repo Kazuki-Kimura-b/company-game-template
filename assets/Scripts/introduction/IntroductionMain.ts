@@ -1,10 +1,8 @@
-import BugTracking from "../common/BugTracking";
 import NegaEffector from "../common/NegaEffector";
-import SchoolAPI from "../common/SchoolAPI";
+import ExAPI from "../common/ExAPI";
 import SE from "../common/SE";
 import SystemIcon from "../common/SystemIcon";
 import FinishScreen, { FinishColor } from "../game/FinishScreen";
-import IjinScreen from "../game/IjinScreen";
 import CharaUnkoSensei from "../opening/CharaUnkoSensei";
 import StaticData, { GameMode } from "../StaticData";
 import StoryScreen from "./StoryScreen";
@@ -27,7 +25,7 @@ export default class IntroductionMain extends cc.Component
     @property(StoryScreen) storyScreen:StoryScreen = null;
     @property(cc.Node) loadingBarNode:cc.Node = null;
     @property(cc.Node) finishScreenParentNode:cc.Node = null;
-    @property({ type:cc.AudioClip }) seWarp:cc.AudioClip = null;
+    // @property({ type:cc.AudioClip }) seWarp:cc.AudioClip = null;
     @property({ type:cc.AudioClip }) bgmAudioClip:cc.AudioClip = null;
     @property({ type:cc.AudioClip }) seShock:cc.AudioClip = null;
     @property(cc.Prefab) finishScreenPrefab:cc.Prefab = null;
@@ -35,22 +33,25 @@ export default class IntroductionMain extends cc.Component
     @property(cc.Material) circleMaterial:cc.Material = null;
 
 
-    private _sensei:CharaUnkoSensei = null;
+    private _sensei: CharaUnkoSensei = null;
     private _negaEffector: NegaEffector = null;
     private _finishScreen:FinishScreen = null;
+    private _background: cc.Node = null;
 
 
     start ()
     {
         // 背景を読み込み
-        let bgNode: cc.Node = cc.instantiate(this.bgPrefab);
-        this.bgParentNode.addChild(bgNode);
-        
-        // うんこ先生を読み込み
-        let usNode: cc.Node = cc.instantiate(this.charaUnkoSenseiPrefab);
-        this.unkoSenseiParentNode.addChild(usNode);
-        this._sensei = usNode.getComponent(CharaUnkoSensei);
-        this._sensei.setup();
+        this._background = cc.instantiate(this.bgPrefab);
+        this.bgParentNode.addChild(this._background);
+
+        if (StaticData.gameSetting.useNormalCharaIntro) {
+            // うんこ先生を読み込み
+            let usNode: cc.Node = cc.instantiate(this.charaUnkoSenseiPrefab);
+            this.unkoSenseiParentNode.addChild(usNode);
+            this._sensei = usNode.getComponent(CharaUnkoSensei);
+            this._sensei.setup();
+        }
 
         //ゲーム画面を事前読み込み
         this.loadingBarNode.active = false;     //ローディングバーは非表示にしておく
@@ -133,7 +134,7 @@ export default class IntroductionMain extends cc.Component
 
 
         if (!StaticData.playerData) {
-            SchoolAPI.importGameSettings(() => {
+            ExAPI.importGameSettings(() => {
                 this._showStory();
             });
         } else {

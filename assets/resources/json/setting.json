@@ -2,13 +2,12 @@
 {
     "setting": {
         "companyName": "yanmar",
-        "isRandomQuestion": true,
-        "allQuestionNum": 15,
         "isTestMode": true,
-        "showSpecificQuestion": false,
-        "specificQuestinNum": 0,
-        "showSpecificResult": false,
-        "specificResultNum": 0
+        "isRandomQuestion": false,
+        "specificQuestinNum": null,
+        "specificResultNum": null,
+        "useNormalCharaIntro": true,
+        "useNormalCharaEnding": true
     },
     "playerData": {
         "bgm": "A",

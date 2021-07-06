@@ -26,7 +26,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "2",
@@ -55,7 +58,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "3",
@@ -83,7 +89,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "4",
@@ -110,7 +119,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "5",
@@ -138,7 +150,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "6",
@@ -165,7 +180,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "7",
@@ -194,7 +212,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "8",
@@ -223,7 +244,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "9",
@@ -250,7 +274,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "10",
@@ -277,7 +304,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "11",
@@ -304,7 +334,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "12",
@@ -331,7 +364,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "13",
@@ -358,7 +394,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "14",
@@ -385,7 +424,10 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     },
     {
       "id": "15",
@@ -410,6 +452,9 @@
       "script_fast": "いいペース！",
       "script_normal": "この調子でがんばろう！",
       "script_combo": "[X]コンボ！",
-      "zuhan_size": "normal"
+      "zuhan_size": "normal",
+      "hint1": "ヒント1だよ",
+      "hint2": "ヒント2だよ",
+      "hint3": "ヒント3だよ"
     }
   ]

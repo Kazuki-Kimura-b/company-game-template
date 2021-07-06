@@ -4,7 +4,7 @@ import TapEffect from "../common/TapEffect";
 import SE from "../common/SE";
 import AnsButton from "../answerComponents/AnsButton";
 import StaticData from "../StaticData";
-import SchoolAPI from "../common/SchoolAPI";
+import ExAPI from "../common/ExAPI";
 
 const {ccclass, property} = cc._decorator;
 
@@ -32,8 +32,19 @@ export default class TitleMain extends cc.Component {
     start ()
     {
         this.startButton.active = false;
-        SchoolAPI.importGameSettings(() => {
+        ExAPI.importGameSettings(() => {
             this.startButton.active = true;
+
+            if (StaticData.testMode) {
+                cc.log("テストモード");
+            } else {
+                // 本番環境
+                let rf: string = window.location.search;
+                if (rf) {
+                    rf = rf.slice(1);
+                    StaticData.reference = rf;
+                }
+            }
         });
 
         // シーンを事前に読み込む
@@ -49,24 +60,6 @@ export default class TitleMain extends cc.Component {
                 if(this.loadingBar) this.loadingBar.scaleY = 0;
             }
         );
-
-        if (StaticData.testMode) {
-            // テストモード
-            let query =  window.location.search;
-            cc.log(query);
-            if (query) {
-                query = query.slice(1);
-            } else {
-                cc.log("特にクエリがないよ");
-            }
-        } else {
-            // 本番環境
-            let rf: string = window.location.search;
-            if (rf) {
-                rf = rf.slice(1);
-                StaticData.reference = rf;
-            }
-        }
 
         AnsButton.setShowAnswreButtonSE(this.seShowAnswerButton);
 

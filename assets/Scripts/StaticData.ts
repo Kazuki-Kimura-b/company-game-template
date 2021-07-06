@@ -1,7 +1,6 @@
 import APIAccess from "./common/APIAccess";
 import { CPUData, NavigatorConversations, OpponentCPU } from "./common/Models";
 import {PlayerData} from "./common/Models"
-import { GameSE } from "./game/GameSEComponent";
 
 const {ccclass, property} = cc._decorator;
 
@@ -28,13 +27,12 @@ export enum SpecialEvent
 
 interface GameSetting {
     companyName: string, // 企業名
-    isRandomQuestion: boolean, // ランダムで出題するかどうか
-    allQuestionNum: number, // 全問題数(出題数は10問で固定する)
     isTestMode: boolean, // 確認モードかどうか。確認モードの場合、クエリで設定をつけていく
-    showSpecificQuestion: boolean, // 特定の問題を出題するかどうか
+    isRandomQuestion: boolean, // ランダムで出題するかどうか
     specificQuestionNum: number, // 特定の問題のID
-    showSpecificResult: boolean, // 特定の結果画面を出題する場合
     specificResultNum: number, // 特定の結果画面のID,
+    useNormalCharaIntro: boolean, // イントロ画面で汎用うんこ先生を使うか
+    useNormalCharaEnding: boolean // エンディング画面で汎用うんこ先生を使うか
 }
 
 
@@ -112,7 +110,7 @@ export default class StaticData {
 
     
     /** ゲームモード。こちらはゼミで使用しているのであとで削除する*/
-    public static gameModeID: GameMode = GameMode.KAKUNIN_TEST;
+    public static gameModeID: GameMode = GameMode.GORIBEN;
 
     /** ゴリ勉(イントロダクション)で使用したアイテム */
     public static useItemIDs:number[] = [];
@@ -145,4 +143,42 @@ export default class StaticData {
     public static playerData: PlayerData = null;
 
     public static gameSetting: GameSetting = null;
+
+    
+}
+
+export class EasingName
+{
+    public static quadIn        :string = 'quadIn';
+    public static quadOut       :string = 'quadOut';
+    public static quadInOut     :string = 'quadInOut';
+    public static cubicIn       :string = 'cubicIn';
+    public static cubicOut      :string = 'cubicOut';
+    public static cubicInOut    :string = 'cubicInOut';
+    public static quartIn       :string = 'quartIn';
+    public static quartOut      :string = 'quartOut';
+    public static quartInOut    :string = 'quartInOut';
+    public static quintIn       :string = 'quintIn';
+    public static quintOut      :string = 'quintOut';
+    public static quintInOut    :string = 'quintInOut';
+    public static sineIn        :string = 'sineIn';
+    public static sineOut       :string = 'sineOut';
+    public static sineInOut     :string = 'sineInOut';
+    public static expoIn        :string = 'expoIn';
+    public static expoOut       :string = 'expoOut';
+    public static expoInOut     :string = 'expoInOut';
+    public static circIn        :string = 'circIn';
+    public static circOut       :string = 'circOut';
+    public static circInOut     :string = 'circInOut';
+    public static elasticIn     :string = 'elasticIn';
+    public static elasticOut    :string = 'elasticOut';
+    public static elasticInOut  :string = 'elasticInOut';
+    public static backIn        :string = 'backIn';
+    public static backOut       :string = 'backOut';
+    public static backInOut     :string = 'backInOut';
+    public static bounceIn      :string = 'bounceIn';
+    public static bounceOut     :string = 'bounceOut';
+    public static bounceInOut   :string = 'bounceInOut';
+    public static smooth        :string = 'smooth';
+    public static fade          :string = 'fade';
 }

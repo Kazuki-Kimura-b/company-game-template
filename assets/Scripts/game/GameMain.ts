@@ -1,9 +1,8 @@
 import SchoolText from "../common/SchoolText";
 import HintControl from "./HintControl";
 import SceneChanger from "../common/SceneChanger";
-import SchoolAPI from "../common/SchoolAPI";
-import StaticData, { GameMode, SpecialEvent } from "../StaticData";
-import { PlayerData } from "../common/Models";
+import ExAPI from "../common/ExAPI";
+import StaticData, { GameMode, EasingName } from "../StaticData";
 import AC from "../answerComponents/AC";
 import QuestionData from "./QuestionData";
 import GameBG from "./bg/GameBG";
@@ -16,7 +15,7 @@ import FinishScreen from "./FinishScreen";
 import SleepListener from "../common/SleepListener";
 import AllKaitou from "./AllKaitou";
 import StoryScreen from "../introduction/StoryScreen";
-import { CollectionItem, CPUData, SchoolEnd, UseGameItem } from "../common/Models";
+import { CollectionItem, CPUData, PlayerData, SchoolEnd } from "../common/Models";
 import NegaEffector from "../common/NegaEffector";
 import VSScreen from "./VSScreen";
 import IjinScreen from "./IjinScreen";
@@ -24,7 +23,6 @@ import SE from "../common/SE";
 import { GameSE } from "./GameSEComponent";
 import PlayerStatusBar from "../common/PlayerStatusBar";
 import ScoreBar from "./ScoreBar";
-import ScoreBarGhost from "./ScoreBarGhost";
 import UnkoGet from "./UnkoGet";
 import GhostPlayer from "./GhostPlayer";
 import STFormat from "../common/STFormat";
@@ -34,6 +32,7 @@ import SystemIcon from "../common/SystemIcon";
 import QuestionWindow from "./QuestionWindow";
 import GameEndScreen from "./GameEndScreen";
 import GhostScreen from "../introduction/GhostScreen";
+import CharaUnkoSensei from "../opening/CharaUnkoSensei";
 
 
 const {ccclass, property} = cc._decorator;
@@ -106,10 +105,12 @@ export default class GameMain extends cc.Component {
 	@property(FrontEffect) frontEffect :FrontEffect = null;
 	@property(cc.Node) resultParentNode: cc.Node = null;
 	@property(cc.Prefab) scoreBarPrefab:cc.Prefab = null;
-	@property(cc.Prefab) scoreBarHayabenPrefab:cc.Prefab = null;
-	@property(cc.Prefab) scoreBarGoribenPrefab:cc.Prefab = null;
-	@property(cc.Prefab) scoreBarGhostPrefab:cc.Prefab = null;
-	@property(cc.Prefab) scoreBarPreviewPrefab:cc.Prefab = null;
+	// @property(cc.Prefab) scoreBarHayabenPrefab:cc.Prefab = null;
+	// @property(cc.Prefab) scoreBarGoribenPrefab:cc.Prefab = null;
+	// @property(cc.Prefab) scoreBarGhostPrefab:cc.Prefab = null;
+	@property(cc.Node) unkoSenseiParentNode: cc.Node = null;
+	@property(cc.Prefab) charaUnkoSenseiPrefab: cc.Prefab = null;
+	// @property(cc.Prefab) scoreBarPreviewPrefab:cc.Prefab = null;
 	@property(cc.Prefab) resultScorePrefab: cc.Prefab = null;
 	@property(cc.Prefab) resultGoribenPrefab: cc.Prefab = null;
 	@property(cc.Prefab) resultGhostPrefab: cc.Prefab = null;
@@ -160,7 +161,7 @@ export default class GameMain extends cc.Component {
 	private _openHint: boolean = false;
 	private _alwayShowHint:boolean = false;		//常にヒントを出すモードかどうか
 	private _challengers: Challenger[] = [];
-	private _cpu_datas:{short_name:string, target_score:number, icon_image_url:string, thumbnail_image_url:string, win_script:string, lose_script:string}[] = [];
+	// private _cpu_datas:{short_name:string, target_score:number, icon_image_url:string, thumbnail_image_url:string, win_script:string, lose_script:string}[] = [];
 	private _endAPIResponse:SchoolEnd = null;
 	private _scoreMagnification:number = 1;		//経験値ブースト
 	private _scoreDetail:ScoreDetail;		//正解点、スピードボーナス、コンボボーナス、ノーヒントボーナスがまとまったもの
@@ -174,14 +175,10 @@ export default class GameMain extends cc.Component {
 	private _questionWindow:QuestionWindow = null;
 	private _kaisetsuWindow: KaisetsuWindow = null;
 
-	private _itemCorrectBonus:number = 1;		//アイテムボーナス効果
-	private _itemNoHintBonus:number = 1;
-	private _itemSpeedBonus:number = 1;
-	private _itemComboBonus:number = 1;
 	private _ghostAction:cc.Action = null;
 
 	private _gameScore:number = 0;
-	private _sendAnswers:{question_id:string, answer:string, required_time:number, hint:boolean}[] = [];
+	private _sendAnswers:{question_id:string, answer:string, correct_answer: string, required_time:number, hint:boolean}[] = [];
 	private _correctHistories:boolean[] = [];
 	private _ijinEvent:boolean = false;
 
@@ -200,6 +197,8 @@ export default class GameMain extends cc.Component {
 	/** オフラインテスト。APIを叩かず実行する単体テスト */
 	// private OFFLINE_TEST:boolean = false;
 
+	private _sensei: CharaUnkoSensei = null;
+	private _senseiTween: cc.Tween = null
 
 
 
@@ -230,7 +229,7 @@ export default class GameMain extends cc.Component {
 	 */
     start ()
     {
-		if (!StaticData.playerData) StaticData.playerData = new PlayerData("A", true, 1, 1, 1, "", 1, 1, "プレイヤー", 1, true);
+
 		this._sceneChanger = this.getComponent(SceneChanger);
 		this._negaEffector = this.getComponent(NegaEffector);
 		this._QNum = 0;
@@ -240,9 +239,16 @@ export default class GameMain extends cc.Component {
 
 		this._scoreDetail = new ScoreDetail();
 	
-		this.ijinScreen.setup();
-		this.ijinScreen.hide();
-		this._setIjinRightBottom(0.0);
+		// this.ijinScreen.setup();
+		// this.ijinScreen.hide();
+		// this._setIjinRightBottom(0.0);
+
+		// うんこ先生を読み込み
+        let usNode: cc.Node = cc.instantiate(this.charaUnkoSenseiPrefab);
+        this.unkoSenseiParentNode.addChild(usNode);
+        this._sensei = usNode.getComponent(CharaUnkoSensei);
+        this._sensei.setup();
+		this._setSenseiRightBottom(0.0);
 
 		//問題ウィンドウの設定
 		let qwNode:cc.Node = cc.instantiate(this.questionWindowPrefab);
@@ -259,12 +265,6 @@ export default class GameMain extends cc.Component {
 		{
 			this._answerCheck(answerCode, answer);
 		});
-
-
-		//自分を挑戦者１人目に設定
-		let player:Challenger = new Challenger(StaticData.playerData.nickname, StaticData.playerData.iconSpriteFrame, null, StaticData.playerData.maxPower);
-		this._challengers.push(player);
-
 
 		// BGの設定
 		let bgNode:cc.Node;
@@ -335,12 +335,6 @@ export default class GameMain extends cc.Component {
 		});
 		this.ijinHukidashiOutput.createText("", format);
 
-		let scoreBarNode:cc.Node = cc.instantiate(this.scoreBarPrefab);
-		this.scoreBarParentNode.addChild(scoreBarNode);
-
-		this._scoreBar = scoreBarNode.getComponent(ScoreBar);
-		this._scoreBar.setup();		//ゴリベン：アイコン３つ読み込み
-
 		//---- 初期化終了 ----
 
 
@@ -350,29 +344,90 @@ export default class GameMain extends cc.Component {
 		this._finishScreen = finishScreenNode.getComponent(FinishScreen);
 		this._finishScreen.setupWithCloseAtGameMode(StaticData.gameModeID); // ゲームモードによって色が変わる
 
-
-		//フィニッシュのスクリーンがはける音
-		//cc.tween({}).delay(0.5).call(()=>{ SE.play(GameSE.clip.finishScreenEnd); }).start();
-		
-
 		this._finishScreen.endFinishAction(()=>
 		{
-			this._sceneStart();
+			//自分を挑戦者１人目に設定
+			if (!StaticData.playerData) {
+				ExAPI.importGameSettings(() => {
+					let player:Challenger = new Challenger(StaticData.playerData.nickname, StaticData.playerData.iconSpriteFrame, null, StaticData.playerData.maxPower);
+					this._challengers.push(player);
+
+					let scoreBarNode:cc.Node = cc.instantiate(this.scoreBarPrefab);
+					this.scoreBarParentNode.addChild(scoreBarNode);
+					this._scoreBar = scoreBarNode.getComponent(ScoreBar);
+					this._scoreBar.setup();		//ゴリベン：アイコン３つ読み込み
+					this._sceneStart();
+				});
+			} else {
+				let scoreBarNode:cc.Node = cc.instantiate(this.scoreBarPrefab);
+				this.scoreBarParentNode.addChild(scoreBarNode);
+				this._scoreBar = scoreBarNode.getComponent(ScoreBar);
+				this._scoreBar.setup();		//ゴリベン：アイコン３つ読み込み
+				this._sceneStart();
+			}
 		});
-
 	}
 
-
-	//偉人を右下にする
-	private _setIjinRightBottom(duration:number):void
-	{
-		this.ijinScreen.ijinScaleTo(0.9, duration);
-		this.ijinScreen.ijinMoveTo(cc.v2(200, -200), duration);
+	// うんこ先生を右下にする
+	private _setSenseiRightBottom(duration: number): void {
+		if(duration == 0)
+        {
+            this.unkoSenseiParentNode.scale = 0.8;
+			this.unkoSenseiParentNode.x = 250;
+			this.unkoSenseiParentNode.y = -400;
+            return;
+        }
+        cc.tween(this.unkoSenseiParentNode)
+        .to(duration, {scale: 0.8}, {easing:cc.easeSineOut()})
+        .start();
+        cc.tween(this.unkoSenseiParentNode)
+        .to(duration, { position: cc.v3(250, -400, 0) }, { easing:cc.easeSineOut() })
+        .start();
 	}
-	private _setIjinCenter(duration:number):void
-	{
-		this.ijinScreen.ijinScaleTo(IjinScreen.SCALE_STORY, duration);
-		this.ijinScreen.ijinMoveTo(cc.v2(0, IjinScreen.Y_STORY), duration);
+
+	private _setSenseiCenter(duration: number): void {
+		if(duration == 0)
+        {
+            this.unkoSenseiParentNode.scale = 1.2;
+			this.unkoSenseiParentNode.x = 200;
+			this.unkoSenseiParentNode.y = 200;
+            return;
+        }
+        cc.tween(this.unkoSenseiParentNode)
+        .to(duration, { scale:1.2 }, { easing:cc.easeSineOut()})
+        .start();
+        cc.tween(this.unkoSenseiParentNode)
+        .to(duration, { position: cc.v3(200, 200, 0) }, { easing:cc.easeSineOut() })   //https://docs.cocos.com/creator/api/en/classes/Easing.html
+        .start();
+	}
+
+	private _senseiActionBuruburu(): void {
+		cc.tween(this.unkoSenseiParentNode)
+        .repeatForever(
+            cc.tween()
+            .to(0.0, { position: cc.v2(3, 0) })
+            .delay(0.05)
+            .to(0.0, { position: cc.v2(-3, 0) })
+            .delay(0.05)
+        )
+        .start();
+	}
+
+	private _senseiActionBikkuri(): void {
+		this._senseiTween = cc.tween(this.unkoSenseiParentNode)
+        .to(0.2, { position:cc.v3(0, 30, 0) }, { easing:EasingName.cubicOut })
+        .to(0.1, { position:cc.v3(0, 0, 0) }, { easing:EasingName.cubicIn })
+        .start();
+	}
+
+	private _senseiStopAction(): void {
+		if(this._senseiTween != null)
+        {
+            this._senseiTween.stop();
+            this._senseiTween = null;
+            this.unkoSenseiParentNode.x = 0;
+            this.unkoSenseiParentNode.y = 0;
+        }
 	}
 
 
@@ -401,64 +456,8 @@ export default class GameMain extends cc.Component {
 				{
 					//ローディングバー非表示
 					this.frontEffect.showLoadingMaxAndHide();
-
-					
-
-					//ごり勉の場合はカバーがはける演出
-					if(StaticData.gameModeID == GameMode.GORIBEN)
-					{
-						let itemIDs:number[] = StaticData.useItemIDs;
-
-						if(itemIDs.length == 0)
-						{
-							//ゲーム開始
-							this._gameStart();
-							return;
-						}
-						
-
-						//アイテム使用APIに送信
-						let itemJson:{id:number}[] = [];
-						for(let i:number = 0 ; i < itemIDs.length ; i ++)
-						{
-							itemJson.push({id: itemIDs[i]});
-						}
-
-						cc.log(itemJson);
-			
-						SchoolAPI.useGameItems(itemJson, this._requestToken, (response:UseGameItem)=>
-						{
-							if(! response)
-							{
-								BugTracking.notify("アイテム使用エラー", "GameMain", { msg:"アイテム使用エラー", itemJson:itemJson } );
-								return;
-							}
-
-							StaticData.useItemIDs = null;
-							StaticData.playerData.coin = response.coin;
-
-							//アイテム選択を完了した
-							
-							//アイテム効果(responseの使うように直すべき)
-							for(let i:number = 0 ; i < response.items.length ; i ++)
-							{
-								cc.log("アイテム効果適応：" + response.items[i].name);
-								let itemID:number = response.items[i].id;
-								if (itemID == GameMain.ITEM_ID_SPEED_BONUS_X_2) this._itemSpeedBonus = 2;
-								else if (itemID == GameMain.ITEM_ID_NO_HINT_BONUS_X_2) this._itemNoHintBonus = 2;
-								else if (itemID == GameMain.ITEM_ID_CORRECT_BONUS_X_2) this._itemCorrectBonus = 2;
-								else if (itemID == GameMain.ITEM_ID_COMBO_BONUS_X_2) this._itemComboBonus = 2;
-							}
-
-							//ゲーム開始
-							this._gameStart();
-						});
-					}
-					else
-					{
 						this._gameStart();
-					}
-					
+
 				});
 
 			});
@@ -481,18 +480,13 @@ export default class GameMain extends cc.Component {
 			return;
 		}
 
-		let bgmFileName:string = "";
-		if(StaticData.playerData.bgm == "A") bgmFileName = "audiostock_113923";
-		else if(StaticData.playerData.bgm == "B") bgmFileName = "audiostock_834620";
-		else if(StaticData.playerData.bgm == "C") bgmFileName = "audiostock_823827";
-
 
 		//BGM読み込み中コメント表示
 		this.hintControl.loadingBgm();
 
 
 		//曲の読み込み開始
-		cc.loader.loadRes("BGM/" + bgmFileName, cc.AudioClip,
+		cc.loader.loadRes("BGM/audiostock_113923", cc.AudioClip,
 		(completedCount:number, totalCount:number, item:any)=>
 		{
 			//cc.log("---PROGRESS  BGM (" + completedCount + "/" + totalCount + ")-----------------------");
@@ -521,7 +515,7 @@ export default class GameMain extends cc.Component {
 		this.hintControl.loadingQuestionData();
 
 		// APIに接続し、tokenを取得
-		SchoolAPI.exStart(StaticData.companyGameMode, StaticData.reference, (response): void => {
+		ExAPI.exStart(StaticData.companyGameMode, StaticData.reference, (response): void => {
 			// リクエストトークンを取得
 			this._requestToken = response.token;
 
@@ -531,124 +525,25 @@ export default class GameMain extends cc.Component {
 			// 問題データを取得
 			cc.loader.loadRes("json/questions", (err, res) => {
 				this._qDatas = res.json;
+				if (StaticData.gameSetting.isRandomQuestion) {
+					for (var i = this._qDatas.length - 1; i > 0; i--) {
+						var r = Math.floor(Math.random() * (i + 1));
+						var tmp = this._qDatas[i];
+						this._qDatas[i] = this._qDatas[r];
+						this._qDatas[r] = tmp;
+					}
+				}
 				cc.log(this._qDatas);
 				this._makeLoadImageList();
 
 				//偉人を表示
-				this.ijinScreen.setIjinImage(StaticData.ijinData.ijinImageSpriteFrame);
-				this.ijinScreen.show();
+				// this.ijinScreen.setIjinImage(StaticData.ijinData.ijinImageSpriteFrame);
+				// this.ijinScreen.show();
 
 				callback();
 			})
 		});
 	}
-
-
-	// private _loadQuestions (callback:()=>void):void
-	// {
-	// 	//問題データ読み込み中コメント表示
-	// 	this.hintControl.loadingQuestionData();
-
-	// 	// ゲーム開始API
-	// 	if(! this.OFFLINE_TEST)		//かつてのStaticData.debugBlockAPI
-	// 	{
-	// 		cc.log("API START (GAME START) ----------------");
-	// 		SchoolAPI.schoolStart(StaticData.gameModeName, (startResponse:any)=>
-	// 		{
-	// 			//リクエストトークンを取得
-	// 			this._requestToken = startResponse.token;
-	// 			cc.log("REQUEST_TOKEN : " + this._requestToken);
-				
-	// 			//基本のセリフをAPIから取得
-	// 			this.hintControl.setupBasicHints(startResponse);
-
-	// 			//偉人の情報を保持
-	// 			this._cpu_datas = startResponse.cpu_data;
-
-	// 			//経験値ブースト
-	// 			if(StaticData.gameModeID == GameMode.GORIBEN)
-	// 			{
-	// 				if(startResponse.score_magnification) this._scoreMagnification = startResponse.score_magnification;
-	// 			}
-				
-				
-	// 			//問題データをAPIから取得
-	// 			cc.log("API GET QUESTION DATAS ----------------");
-	// 			SchoolAPI.getSchoolQuestion(this._requestToken, (response)=>
-	// 			{
-	// 				this._qDatas = QuestionData.createQuestionDatas(response);
-
-	// 				if(this._qDatas.length < 10)
-	// 				{
-	// 					BugTracking.notify("取得問題不足", "GameMain", { msg:"取得した問題データ数は" + this._qDatas.length + "問で不足しています。", response:response });
-	// 					return;
-	// 				}
-
-	// 				this._makeLoadImageList();
-	// 				cc.log(this._loadImageList);
-
-
-	// 				//ごり勉モードは偉人の画像も読み込む
-	// 				if(StaticData.gameModeID == GameMode.GORIBEN)
-	// 				{
-	// 					if(this._cpu_datas.length < 3)
-	// 					{
-	// 						BugTracking.notify("CPUデータ不足", "GameMain", { msg:"CPUデータが不足しています : " + this._cpu_datas.length, cpu_datas:this._cpu_datas });
-	// 						return;
-	// 					}
-
-	// 					//ザコ３体のデータを作成
-
-	// 					//スコアバーに偉人3体の最終スコアを渡す
-
-	// 					//偉人を表示
-	// 					this.ijinScreen.setIjinImage(StaticData.ijinData.ijinImageSpriteFrame);
-	// 					this.ijinScreen.show();
-
-	// 					callback();
-
-	// 				}
-	// 				//ゴーストモードはゴーストを表示
-	// 				else if(StaticData.gameModeID == GameMode.GHOST)
-	// 				{
-	// 					//画面右下にゴーストを仮配置
-	// 					let node:cc.Node = cc.instantiate(this.ghostPlayerPrefab);
-	// 					this._ghostPlayer = node.getComponent(GhostPlayer);
-	// 					this._ghostPlayer.setup();
-
-	// 					let ijinImgSp:cc.Sprite = this.ijinScreen.ijinSprite;
-	// 					ijinImgSp.node.addChild(node);
-	// 					ijinImgSp.enabled = false;		//スプライト自体は切る
-
-	// 					this.ijinScreen.show();
-
-	// 					let ghostScoreBar:ScoreBarGhost = this._scoreBar as ScoreBarGhost;
-	// 					ghostScoreBar.setupGhostScore(this._qDatas);
-
-
-
-	// 					callback();
-	// 				}
-	// 				else if(StaticData.gameModeID == GameMode.HAYABEN)
-	// 				{
-	// 					//this._loadQuestionImages(0);
-	// 					callback();
-	// 				}
-	// 				else if(StaticData.gameModeID == GameMode.KAKUNIN_TEST)
-	// 				{
-	// 					callback();
-	// 				}
-	// 				else
-	// 				{
-	// 					BugTracking.notify("条件分岐エラー", "GameMain", { msg:"ここにはこないはず" });
-	// 				}
-
-	// 			});
-	// 		});
-	// 	}
-	// }
-
-
 
 	/**
 	 * 読み込む画像リストを作成する
@@ -707,7 +602,7 @@ export default class GameMain extends cc.Component {
 		}
 
 		//画像の読み込み
-		SchoolAPI.loadZuhanImage(this._loadImageList[loadIndex], (result)=>
+		ExAPI.loadZuhanImage(this._loadImageList[loadIndex], (result)=>
 		{
 			//読み込み完了時
 			if(result.error != null)
@@ -740,7 +635,7 @@ export default class GameMain extends cc.Component {
 		}
 		
 		//画像の読み込み
-		SchoolAPI.loadImage("key", urlList[imgs.length], (result)=>
+		ExAPI.loadImage("key", urlList[imgs.length], (result)=>
 		{
 			//読み込み完了時
 			if(result.error != null)
@@ -770,68 +665,12 @@ export default class GameMain extends cc.Component {
 	 */
     private _gameStart ():void
     {
-
-		/*
-		//結果画面を確認
-		SchoolAPI.schoolEnd(123, "", (response:SchoolEnd)=>
-		{
-			this._endAPIResponse = response;
-			this._showResult();
-		});
-		return;
-		*/
-
-
-		/*
-		// 回答一覧(テストで表示)
-		{
-			let node:cc.Node = cc.instantiate(this.allKaitouPrefab);
-			let allKaitou:AllKaitou = node.getComponent(AllKaitou);
-			allKaitou.setup(this.canvas.node, this._qDatas, this._IMG_RES);
-			this.frontEffect.node.addChild(node);
-			return;
-		}
-		*/
-
-		//偉人ワープ登場（テストで表示）
-		/*
-		{
-			let node:cc.Node = cc.instantiate(this.nextIjinWarpPrefab);
-			let nextIjinWarp:NextIjinWarp = node.getComponent(NextIjinWarp);
-			nextIjinWarp.setup(()=>{  });
-			this.frontEffect.node.addChild(node);
-			return;
-		}
-		*/
-
-		//ゲーム終了
-		/*
-		{
-			let node:cc.Node = cc.instantiate(this.gameEndScreenPrefab);
-			let gameEndScreen:GameEndScreen = node.getComponent(GameEndScreen);
-			gameEndScreen.setup(this.canvas);
-			this.frontEffect.node.addChild(node);
-			return;
-		}
-		*/
-
-		//ローディングバー非表示
-		//this.frontEffect.hideLoadingBar();
-
-
 		//画像データを渡す
 		this._questionWindow.setImageResources(this._IMG_RES);
 
-		// if(StaticData.previewMode)
-		// {
-		// 	this._setupQuestion();
-		// 	return;
-		// }
-		
 		//ゲーム開始処理 (BGMなど)
-        
 		cc.log("ゲーム開始");
-		
+
 		//背景、準備完了時
 		this._gameBG.ready();
 
@@ -852,23 +691,21 @@ export default class GameMain extends cc.Component {
                 this._setupQuestion();
 			}
 		);
-
-		
 	}
 
 
-	
+
 	/**
 	 * 問題を作成 (1問目から最終問題までこれを繰り返す)
 	 */
 	private _setupQuestion ():void
 	{
 		//ゴリ勉モードで偉人が割り込むイベント
-		if(StaticData.gameModeID == GameMode.GORIBEN && this._QNum == GameMain.IJIN_CUTIN_EVENT_TURN - 1 && ! this._ijinEvent)
+		if(this._QNum == GameMain.IJIN_CUTIN_EVENT_TURN - 1 && ! this._ijinEvent)
 		{
 			//偉人の吹き出しを消す
 			this.ijinHukidashiNode.active = false;
-			
+
 			this._ijinInsertEvent(()=>
 			{
 				this._ijinEvent = true;		//見たフラグ
@@ -876,12 +713,12 @@ export default class GameMain extends cc.Component {
 			});
 			return;
 		}
-		
+
 		//ヒントを開いたかどうか（スコアに影響）alwayShowHintがtrueなら常にtrue
 		this._openHint = this._alwayShowHint;
 
 		let qData = this._qDatas[this._QNum];
-		StaticData.lastQuestionID = qData.id;		//デバッグ用に最後に表示した問題idを保持
+		// StaticData.lastQuestionID = qData.id;		//デバッグ用に最後に表示した問題idを保持
 
 		//問題文がない場合空白文字にする
 		if(qData.question == null) qData.question = "";
@@ -935,29 +772,29 @@ export default class GameMain extends cc.Component {
 			this.ijinHukidashiNode.active = false;
 
 			//ゴーストの動作開始
-			if(StaticData.gameModeID == GameMode.GHOST)
-			{
-				let requiredTime:number = this._qDatas[this._QNum].ghost_required_time;
-				let ghostResult:boolean = this._qDatas[this._QNum].ghost_result;
+			// if(StaticData.gameModeID == GameMode.GHOST)
+			// {
+			// 	let requiredTime:number = this._qDatas[this._QNum].ghost_required_time;
+			// 	let ghostResult:boolean = this._qDatas[this._QNum].ghost_result;
 
-				this._ghostAction = this.node.runAction(
-					cc.sequence(
-						cc.delayTime(requiredTime),
-						cc.callFunc(()=>{
-							//ゴースト正解
-							if(ghostResult)
-							{
-								this._ghostPlayer.goodAction();
-							}
-							//ゴースト不正解
-							else
-							{
-								this._ghostPlayer.badAction();
-							}
-						})
-					)
-				);
-			}
+			// 	this._ghostAction = this.node.runAction(
+			// 		cc.sequence(
+			// 			cc.delayTime(requiredTime),
+			// 			cc.callFunc(()=>{
+			// 				//ゴースト正解
+			// 				if(ghostResult)
+			// 				{
+			// 					this._ghostPlayer.goodAction();
+			// 				}
+			// 				//ゴースト不正解
+			// 				else
+			// 				{
+			// 					this._ghostPlayer.badAction();
+			// 				}
+			// 			})
+			// 		)
+			// 	);
+			// }
 		});
 
 		
@@ -965,36 +802,36 @@ export default class GameMain extends cc.Component {
 
 
 
-	/**
-	 * プレビュー問題を表示
-	 * @param questionData 問題データ
-	 */
-	public showPreviewQuestion(questionData:QuestionData):void
-	{
-		if(questionData == null)
-		{
-			console.log(questionData);
-			BugTracking.notify("プレビューモード問題取得エラー", "GameMain.showPreviewQuestion()", { msg:"問題データが取得できませんでした", questionData:questionData } );
-			return;
-		}
+	// /**
+	//  * プレビュー問題を表示
+	//  * @param questionData 問題データ
+	//  */
+	// public showPreviewQuestion(questionData:QuestionData):void
+	// {
+	// 	if(questionData == null)
+	// 	{
+	// 		console.log(questionData);
+	// 		BugTracking.notify("プレビューモード問題取得エラー", "GameMain.showPreviewQuestion()", { msg:"問題データが取得できませんでした", questionData:questionData } );
+	// 		return;
+	// 	}
 
-		this.hintControl.hideHintButton();
+	// 	this.hintControl.hideHintButton();
 		
-		this._questionWindow.hideImage();
-		this._resetCurrentQuestion();		//表示中の問題を削除
+	// 	this._questionWindow.hideImage();
+	// 	this._resetCurrentQuestion();		//表示中の問題を削除
 		
-		console.log("プレビュー問題表示");
-		console.log(questionData);
+	// 	console.log("プレビュー問題表示");
+	// 	console.log(questionData);
 
-		this._qDatas = [questionData];
-		this._QNum = 0;
-		this._makeLoadImageList();
-		this._loadQuestionImages(0, ()=>
-		{
-			//表示開始
-			this._gameStart();
-		});
-	}
+	// 	this._qDatas = [questionData];
+	// 	this._QNum = 0;
+	// 	this._makeLoadImageList();
+	// 	this._loadQuestionImages(0, ()=>
+	// 	{
+	// 		//表示開始
+	// 		this._gameStart();
+	// 	});
+	// }
 
 
 	
@@ -1015,7 +852,7 @@ export default class GameMain extends cc.Component {
 			{
 				//残り10秒音
 				if(time == 10) this._seID_harryUp = SE.play(GameSE.clip.harryUp);
-				
+
 				//背景に時間を渡す
 				this._gameBG.harryUp(time);
 
@@ -1024,7 +861,7 @@ export default class GameMain extends cc.Component {
 			},
 			//タイムアップ
 			()=>{
-				
+
 				//ヒントボタン消す
 				this.hintControl.hideHintButton();
 
@@ -1077,19 +914,19 @@ export default class GameMain extends cc.Component {
 		}
 
 		//サーバに送信するためのデータ作成
-		let sendAnswer:{ question_id: string,answer: string, required_time: number, hint: boolean } =
+		let sendAnswer:{ question_id: string, answer: string, correct_answer: string, required_time: number, hint: boolean } =
 		{
 			question_id: this._qDatas[this._QNum].id,
 			answer:answer,
+			correct_answer: this._qDatas[this._QNum].correct_answer,
 			required_time: this._questionWindow.timeBoard.getAnwerFloatTime(),
 			hint: this._openHint
 		};
 		this._sendAnswers.push(sendAnswer);
 		this._correctHistories.push(rightAnswer);	//正解、不正解の情報だけまとめる
 
-		cc.log("sendAnswer:");
-		cc.log(sendAnswer);
-		
+		// cc.log("sendAnswer:");
+		// cc.log(sendAnswer);
 		//正解
 		if(rightAnswer)
 		{
@@ -1108,15 +945,10 @@ export default class GameMain extends cc.Component {
 			// コンボボーナス：リストに沿った点数。10問で150点
 			// 小数点第二位まで表示
 
-			
-
-
 			//基本スコア
 			let baseScore:number = 10;
 			//残り秒数 × 0.25。最終的にはタイムボーナスの合計値を少数第１位まで切り捨てる
 			let timeBonus:number = this._questionWindow.timeBoard.getRemainingFloatTime() * 0.25;
-			//残り秒数(少数第一まで) × 0.25 のあと、もう一度少数第１位まで切り捨て
-			//let timeBonus:number = Math.floor(Math.floor(this.timeBoard.getRemainingTime()* 10) * 0.25) * 0.1;
 			//コンボで入るスコア
 			let addComboScore:number = GameMain.COMBO_SCORE_LIST[this._combo];
 			//ノーヒントスコア
@@ -1129,22 +961,9 @@ export default class GameMain extends cc.Component {
 			this._scoreDetail.noHint += noHintBonus;
 			this._scoreDetail.keikaTimes.push(this._questionWindow.timeBoard.getAnwerFloatTime());
 
-			
-
-			//アイテム効果
-			baseScore *= this._itemCorrectBonus;
-			timeBonus *= this._itemSpeedBonus;
-			addComboScore *= this._itemComboBonus;
-			noHintBonus *= this._itemNoHintBonus;
-
-			//アイテム効果のみのスコア
+			//この問題でのスコア
 			let correctDefScore:number = baseScore + timeBonus + addComboScore + noHintBonus;
-			cc.log("ブーストなしスコア:" + baseScore + " + " + timeBonus + " + " + addComboScore + " + " + noHintBonus + " = " + correctDefScore);
-
-			//経験値ブーストをかけたスコア(少数第2位以下切り捨て)
-			let correctExpBoostScore:number = Math.floor(correctDefScore * this._scoreMagnification * 10) * 0.1;
-			cc.log("ブーストしたスコア:" + correctExpBoostScore);
-
+			cc.log("この問題でのスコア:" + baseScore + " + " + timeBonus + " + " + addComboScore + " + " + noHintBonus + " = " + correctDefScore);
 
 			//＋表示が飛んでいく座標
 			let bonusLandingPos:cc.Vec2 = this._scoreBar.getBonusLandingPos(this.comboBonusDisp.parent);
@@ -1162,16 +981,7 @@ export default class GameMain extends cc.Component {
 			let currentTotalTimeBonus:number = Math.floor(shoyouTime * 0.25 * 10) / 10;
 
 
-			let totalDefScore:number =
-				this._scoreDetail.base * this._itemCorrectBonus +
-				//this._scoreDetail.timeRaw * this._itemSpeedBonus +
-				currentTotalTimeBonus * this._itemSpeedBonus +		//石島さんの方式(2021/02/15)
-				this._scoreDetail.combo * this._itemComboBonus +
-				this._scoreDetail.noHint * this._itemNoHintBonus;
-			
-			this._gameScore = Math.floor(totalDefScore * this._scoreMagnification * 10) / 10;
-
-			cc.log("スコア:" + this._scoreDetail.base + " + " + currentTotalTimeBonus + " + " + this._scoreDetail.combo + " + " + this._scoreDetail.noHint);
+			this._gameScore = this._scoreDetail.base + currentTotalTimeBonus +  this._scoreDetail.combo + this._scoreDetail.noHint;
 			cc.log("現在のスコア:" + this._gameScore);
 
 
@@ -1300,7 +1110,6 @@ export default class GameMain extends cc.Component {
 						})
 					)
 				);
-				
 				waitTime += 0.3;// 0.8;
 			}
 
@@ -1349,34 +1158,15 @@ export default class GameMain extends cc.Component {
 					cc.callFunc(()=>
 					{
 						this._scoreBar.addScore(rightAnswer, this._gameScore);
-						
-						//下のnextQuestion()でウンコムシが消えるので、ここでスコアボードに加算
-						if(StaticData.gameModeID == GameMode.HAYABEN)
-						{
-							//強制的に解説が出る
-							this._showKaisetsu(rightAnswer);
-							return;
-						}
-						else if(StaticData.gameModeID == GameMode.GHOST)
-						{
-
-						}
-						else
-						{
-							//偉人が正解したか先に確認
-							//let scoreGori:ScoreBarGoriben = this._scoreBar as ScoreBarGoriben;
-							//let ijinCorrect:boolean = scoreGori.isIjinCorrect();
-
-							//偉人の吹き出し
-							this._showIjinMiniHukidash(true);
-
-							this.ijinScreen.ijinActionBuruburu();
-							cc.tween({})
-							.delay(0.8)
-							.call(()=>{ this.ijinScreen.ijinStopAction(); })
-							.start();
-						}
-						
+						//強制的に解説が出る
+						this._showKaisetsu(rightAnswer);
+						this._showIjinMiniHukidash(true);
+						// this.ijinScreen.ijinActionBuruburu();
+						this._senseiActionBuruburu();
+						cc.tween({})
+						.delay(0.8)
+						.call(()=>{ this._senseiStopAction(); })
+						.start();
 						this._nextQuestion();
 					})
 				)
@@ -1391,13 +1181,9 @@ export default class GameMain extends cc.Component {
 			//効果音：間違い
 			SE.play(GameSE.clip.batsu);
 
-			//ゴリベンの場合、吹き出し
-			if(StaticData.gameModeID == GameMode.GORIBEN)
-			{
-				this.ijinScreen.ijinActionBikkuri();	//ぴょんと跳ねる
-				//偉人の吹き出し登場
-				this._showIjinMiniHukidash(false);
-			}
+			this._senseiActionBikkuri();	//ぴょんと跳ねる
+			//偉人の吹き出し登場
+			this._showIjinMiniHukidash(false);
 
 			
 			//タイムアップ
@@ -1453,25 +1239,6 @@ export default class GameMain extends cc.Component {
 			.start();
 
 		}
-
-		//ゴーストモード、ゴーストの加点
-		if(StaticData.gameModeID == GameMode.GHOST)
-		{
-			let ghostScoreBar:ScoreBarGhost = this._scoreBar as ScoreBarGhost;
-			let ghostCurrentScore:number = ghostScoreBar.getGhostCurrentScore(this._QNum);
-			
-			//ゴーストの勝敗は整数で判定（同点は勝ち）
-			let pSc:number = Math.floor(this._gameScore);
-			let gSc:number = Math.floor(ghostCurrentScore);
-
-			let winNow:boolean = (pSc >= gSc);
-
-			//背景の色を変える
-			// let ghostBG:GameBG_Ghost = this._gameBG.getComponent(GameBG_Ghost);
-			// if(winNow) ghostBG.changeWinBG();
-			// else ghostBG.changeLoseBG();
-		}
-
 	}
 
 
@@ -1494,30 +1261,6 @@ export default class GameMain extends cc.Component {
 
 		//何も表示しない
 		if(script == null || script == "") return;
-
-		/*
-		//とりあえずランダムでどれか表示
-		let scripts:string[];
-		if(isCorrect)
-		{
-			scripts = [ StaticData.ijinData.correct_script1, StaticData.ijinData.correct_script2, StaticData.ijinData.correct_script3 ];
-		}
-		else
-		{
-			scripts = [ StaticData.ijinData.incorrect_script1, StaticData.ijinData.incorrect_script2, StaticData.ijinData.incorrect_script3 ];
-		}
-		let script:string = scripts[Math.floor(Math.random() * 3)];
-		
-		//let script:string = (isCorrect) ? StaticData.ijinData.correct_script1 : StaticData.ijinData.incorrect_script1
-		if(script == null)
-		{
-			if(StaticData.DEBUG_DUMMY_STORIES) script = (isCorrect) ? "なかなかやるな！" : "フッフッフ・・";
-			else script = "null";
-		}
-		*/
-
-		//let se:cc.AudioClip = (isCorrect) ? GameSE.clip.ijinCorrectHukidashi : GameSE.clip.ijinMissHukidashi;
-		//SE.play(se);
 
 		this.ijinHukidashiOutput.setText(script);
 		this.ijinHukidashiOutput.flushText();
@@ -1568,11 +1311,6 @@ export default class GameMain extends cc.Component {
 						cc.jumpBy(0.3, moveX, moveY, 100, 1)
 					),
 					cc.removeSelf()
-					/*
-					cc.callFunc(()=>
-					{
-						node.destroy();
-					})*/
 				)
 			)
 		}
@@ -1647,18 +1385,14 @@ export default class GameMain extends cc.Component {
 	private _ijinInsertEvent(callback:()=>void):void
 	{
 		//中央に拡大
-		this._setIjinCenter(0.5);
+		// this._setIjinCenter(0.5);
+		this._setSenseiCenter(0.5);
 
 		cc.tween({})
 		.delay(0.5)
 		.call(()=>
 		{
 			let script:string = StaticData.ijinData.play_script;
-			if(script == null)
-			{
-				if(StaticData.DEBUG_DUMMY_STORIES) script = "<i>なかなかやるのう。\n次はワシからの問題じゃ！</i>";
-				else script = "<i>null</i>";
-			}
 			
 			let storyScreenNode:cc.Node = cc.instantiate(this.storyScreenPrefab);
 			this.resultParentNode.addChild(storyScreenNode);
@@ -1672,7 +1406,7 @@ export default class GameMain extends cc.Component {
 				storyScreen.node.removeFromParent(true);
 
 				//偉人右下に戻る
-				this._setIjinRightBottom(0.3);
+				// this._setIjinRightBottom(0.3);
 
 				callback();
 			});
@@ -1704,13 +1438,6 @@ export default class GameMain extends cc.Component {
 
 		//効果音：問題表示
 		SE.play(GameSE.clip.showQuestion);
-		
-		//ゴーストを元に戻す
-		if(StaticData.gameModeID == GameMode.GHOST)
-		{
-			this.node.stopAction(this._ghostAction);
-			this._ghostPlayer.setDefault();
-		}
 
 		//スライドで横にはける
 		this._questionWindow.moveOut(()=>
@@ -1737,52 +1464,42 @@ export default class GameMain extends cc.Component {
 
 	private _preFinishSendAPI()
 	{
+
+		// cc.log("--- 結果算出 ------");
+		// let totalBaseItemScore:number = this._scoreDetail.base;
+
+		// cc.log("==== 回答までにかかった時間 =============");
+
+		// //石島さんの方式に変更(2021/02/15)
+		// let keikaTime:number = 0;
+		// for(let i:number = 0 ; i < this._scoreDetail.keikaTimes.length ; i ++)
+		// {
+		// 	keikaTime += this._scoreDetail.keikaTimes[i];
+		// 	cc.log(this._scoreDetail.keikaTimes[i]);
+		// }
+		// cc.log("-------------------------------");
+		// cc.log("合計:" + keikaTime);
+
+		// let keikaTimeKirisute:number = Math.floor(keikaTime * 10) / 10;
+		// let shoyouTime:number = (this._rightAnswerCount * 40) - keikaTimeKirisute;
+		// let currentTotalTimeBonus:number = Math.floor(shoyouTime * 0.25 * 10) / 10;
+		// // let totalTimeItemScore:number = currentTotalTimeBonus * this._itemSpeedBonus;		//石島さん式(2021/02/15)
+
+		// let totalComboItemScore:number = this._scoreDetail.combo * this._itemComboBonus;
+		// let totalNoHintItemScore:number = this._scoreDetail.noHint * this._itemNoHintBonus;
+
+		// let totalDefScore:number = totalBaseItemScore + totalTimeItemScore + totalComboItemScore + totalNoHintItemScore;
 		
-		cc.log("--- 結果算出 ------");
-		let totalBaseItemScore:number = this._scoreDetail.base * this._itemCorrectBonus;
-		//let totalTimeItemScore:number = this._scoreDetail.time * this._itemSpeedBonus;	//こうじゃなくて
-		//let totalTimeItemScore:number = this._scoreDetail.timeRaw * this._itemSpeedBonus;	//これにしたけどやっぱダメで
-
-
-
-		cc.log("==== 回答までにかかった時間 =============");
-
-		//石島さんの方式に変更(2021/02/15)
-		let keikaTime:number = 0;
-		for(let i:number = 0 ; i < this._scoreDetail.keikaTimes.length ; i ++)
-		{
-			keikaTime += this._scoreDetail.keikaTimes[i];
-			cc.log(this._scoreDetail.keikaTimes[i]);
-		}
-		cc.log("-------------------------------");
-		cc.log("合計:" + keikaTime);
-
-		let keikaTimeKirisute:number = Math.floor(keikaTime * 10) / 10;
-		let shoyouTime:number = (this._rightAnswerCount * 40) - keikaTimeKirisute;
-		let currentTotalTimeBonus:number = Math.floor(shoyouTime * 0.25 * 10) / 10;
-		let totalTimeItemScore:number = currentTotalTimeBonus * this._itemSpeedBonus;		//石島さん式(2021/02/15)
-
-		let totalComboItemScore:number = this._scoreDetail.combo * this._itemComboBonus;
-		let totalNoHintItemScore:number = this._scoreDetail.noHint * this._itemNoHintBonus;
-
-		let totalDefScore:number = totalBaseItemScore + totalTimeItemScore + totalComboItemScore + totalNoHintItemScore;
-		
-		cc.log("各スコア: " + totalBaseItemScore + " + " + totalTimeItemScore + " + " + totalComboItemScore + " + " + totalNoHintItemScore);
-		cc.log("各スコア合計: " + totalDefScore);
-		cc.log("経験値ブースト: " + totalDefScore + " x " + this._scoreMagnification + " = " + (totalDefScore * this._scoreMagnification));
+		// cc.log("各スコア: " + totalBaseItemScore + " + " + totalTimeItemScore + " + " + totalComboItemScore + " + " + totalNoHintItemScore);
+		// cc.log("各スコア合計: " + totalDefScore);
+		// cc.log("経験値ブースト: " + totalDefScore + " x " + this._scoreMagnification + " = " + (totalDefScore * this._scoreMagnification));
 		//↑これの小数点第１位まで切り捨てたのがサーバーのスコア
 
 
 		//----------------------------------
-		
-		cc.log("_sendAnswers:");
-		cc.log(this._sendAnswers);
-
-		cc.log("送信するデータの正解、不正解");
-		cc.log(this._correctHistories);
 
 		//サーバに回答送信
-		SchoolAPI.postSchoolQuestion(this._sendAnswers, this._requestToken, (response:any)=>
+		ExAPI.exResult(this._sendAnswers, this._requestToken, (response:any)=>
 		{
 			cc.log("POST QUESTION RESPONSE");
 			cc.log(response);
@@ -1794,84 +1511,71 @@ export default class GameMain extends cc.Component {
 
 	private _sendEndGameAPI():void
 	{
-		
-		//ごり勉なら偉人のスコアを送信する
-		let mainCpuScore:number = 0;
-		if (StaticData.gameModeID == GameMode.GORIBEN)
-		{
-			//mainCpuScore = this.scoreBoard.getMainCpuScore();
-			mainCpuScore = this._scoreBar.getResultData().ijinScores[0];
-			cc.log("偉人のスコア:" + mainCpuScore);
-		}
-		
-		SchoolAPI.schoolEnd(mainCpuScore, this._requestToken, (response:SchoolEnd)=>
+		ExAPI.exEnd(this._requestToken, (response:SchoolEnd)=>
 		{
 			cc.log("GAME END RESPONSE");
 			cc.log(response);
 
-			//サーバと正解数がズレていないか確認
-			let wrongResults:boolean[] = [];		//ズレた問題idを入れる
+			// //サーバと正解数がズレていないか確認
+			// let wrongResults:boolean[] = [];		//ズレた問題idを入れる
 
-			cc.log(response.answers);
-			for(let i:number = 0 ; i < response.answers.length ; i ++)
-			{
-				if(response.answers[i].result != this._correctHistories[i])
-				{
-					//サーバとゲームの正解・不正解が異なる
-					wrongResults.push(response.answers[i].question_id);
-				}
-			}
+			// cc.log(response.answers);
+			// for(let i:number = 0 ; i < response.answers.length ; i ++)
+			// {
+			// 	if(response.answers[i].result != this._correctHistories[i])
+			// 	{
+			// 		//サーバとゲームの正解・不正解が異なる
+			// 		wrongResults.push(response.answers[i].question_id);
+			// 	}
+			// }
 
-			if(wrongResults.length > 0)
-			{
-				let str:string = "";
-				for(let i:number = 0 ; i < wrongResults.length ; i ++)
-				{
-					str += " " + wrongResults[i];
-				}
+			// if(wrongResults.length > 0)
+			// {
+			// 	let str:string = "";
+			// 	for(let i:number = 0 ; i < wrongResults.length ; i ++)
+			// 	{
+			// 		str += " " + wrongResults[i];
+			// 	}
 
-				BugTracking.notify("サーバとゲームで正解のズレ発生", "GameMain._sendEndGameAPI()",
-				{
-					msg:"サーバとゲームで正解のズレ発生。\nID:" + str,
-					api_answers:response.answers,
-					game_answers:this._correctHistories,
-					wrongIDs:wrongResults
-				});
-			}
-			else
-			{
-				//サーバとの誤差を確認するためのスコア
-				let checkScore:number = Math.floor(this._gameScore * 10) / 10;
+			// 	BugTracking.notify("サーバとゲームで正解のズレ発生", "GameMain._sendEndGameAPI()",
+			// 	{
+			// 		msg:"サーバとゲームで正解のズレ発生。\nID:" + str,
+			// 		api_answers:response.answers,
+			// 		game_answers:this._correctHistories,
+			// 		wrongIDs:wrongResults
+			// 	});
+			// }
+			// else
+			// {
+			// 	//サーバとの誤差を確認するためのスコア
+			// 	let checkScore:number = Math.floor(this._gameScore * 10) / 10;
 
-				if(checkScore != response.scoring_total)
-				{
-					let keikaTime:number = 0;
-					for(let i:number = 0 ; i < this._scoreDetail.keikaTimes.length ; i ++)
-					{
-						keikaTime += this._scoreDetail.keikaTimes[i];
-					}
-					let keikaTimeKirisute:number = Math.floor(keikaTime * 10) / 10;
-					let shoyouTime:number = (this._rightAnswerCount * 40) - keikaTimeKirisute;
-					let currentTotalTimeBonus:number = Math.floor(shoyouTime * 0.25 * 10) / 10;
+			// 	if(checkScore != response.scoring_total)
+			// 	{
+			// 		let keikaTime:number = 0;
+			// 		for(let i:number = 0 ; i < this._scoreDetail.keikaTimes.length ; i ++)
+			// 		{
+			// 			keikaTime += this._scoreDetail.keikaTimes[i];
+			// 		}
+			// 		let keikaTimeKirisute:number = Math.floor(keikaTime * 10) / 10;
+			// 		let shoyouTime:number = (this._rightAnswerCount * 40) - keikaTimeKirisute;
+			// 		let currentTotalTimeBonus:number = Math.floor(shoyouTime * 0.25 * 10) / 10;
 					
-					BugTracking.notify("スコア誤差発生", "GameMain._sendEndGameAPI()",
-					{
-						msg:"ゲーム: " + this._gameScore + " / サーバ: " + response.scoring_total + " 回答時間合計：" + keikaTime + " -> " + keikaTimeKirisute + " スピード点：" + currentTotalTimeBonus,
-						game_score:this._gameScore,
-						api_score:response.scoring_total,
-						game_send:this._scoreDetail,
-						game_correct:this._rightAnswerCount,
-						api_response:response
-					});
-				}
-			}
+			// 		BugTracking.notify("スコア誤差発生", "GameMain._sendEndGameAPI()",
+			// 		{
+			// 			msg:"ゲーム: " + this._gameScore + " / サーバ: " + response.scoring_total + " 回答時間合計：" + keikaTime + " -> " + keikaTimeKirisute + " スピード点：" + currentTotalTimeBonus,
+			// 			game_score:this._gameScore,
+			// 			api_score:response.scoring_total,
+			// 			game_send:this._scoreDetail,
+			// 			game_correct:this._rightAnswerCount,
+			// 			api_response:response
+			// 		});
+			// 	}
+			// }
 
 			//スコアをサーバから受け取ったものに変更、結果画面へ
-			this._gameScore = response.scoring_total;
-			this._rightAnswerCount = response.accuracy_num;		//こっちは正解数
-
-			StaticData.ghostDate = response.ghost_date;		//対戦したゴーストの日付を保持
-			
+			// this._gameScore = response.scoring_total;
+			// this._rightAnswerCount = response.accuracy_num;		//こっちは正解数
 			this._endAPIResponse = response;
 
 			this._finish();
@@ -1897,27 +1601,8 @@ export default class GameMain extends cc.Component {
 		this.finishTextNode.runAction(
 			cc.scaleTo(0.24, 1.0).easing(cc.easeBackOut())
 		);
-
-		if(StaticData.gameModeID == GameMode.GORIBEN)
-		{
-			//デバッグで常に勝利（コレクションゲット）
-			if(StaticData.DEBUG_ALWAYS_GORIBEN_WIN && this._endAPIResponse.collections == null)
-			{
-				cc.log("必ず勝つ！！");
-				this._endAPIResponse.collections = new CollectionItem("創造", "{釈,しゃ}{迦,か}【シャカ】", "きらびやかなうんこだなあ。\nありがたやありがたや。", "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/005_unko.png", 1, null);
-			}
-			
-			//偉人の吹き出しを消す
-			this.ijinHukidashiNode.active = false;
-			//偉人、でかくする
-			this._setIjinCenter(0.5);
-		}
-		else if(StaticData.gameModeID == GameMode.GHOST)
-		{
-			//ゴーストを消す
-			this._ghostPlayer.node.removeFromParent(true);
-			this._ghostPlayer = null;
-		}
+		
+		this.ijinHukidashiNode.active = false;
 		
 		//全問終了 背景、終了演出
 		this._gameBG.finish(()=>
@@ -1943,9 +1628,6 @@ export default class GameMain extends cc.Component {
 			//背景をリザルト背景に変更
 			this._gameBG.changeResultBG();
 
-			//フィニッシュのスクリーンがはける音
-			//SE.play(GameSE.clip.finishScreenEnd);
-			
 			this._showResult();
 		});
 	}
@@ -2276,7 +1958,8 @@ export default class GameMain extends cc.Component {
 				{
 					//偉人登場
 					this.ijinScreen.setIjinImage(StaticData.ijinData.ijinImageSpriteFrame);
-					this._setIjinCenter(0);
+					// this._setIjinCenter(0);
+					this._setSenseiCenter(0);
 					this.ijinScreen.show();
 				}
 
@@ -2297,47 +1980,47 @@ export default class GameMain extends cc.Component {
 			}
 			//-----------------------------
 			// もう一度修行をする
-			else if(code == Result.RTN_SC_RE_TRAINING)
-			{
+			// else if(code == Result.RTN_SC_RE_TRAINING)
+			// {
 
-				//ゴーストならゴースト登場
-                SchoolAPI.ghostModeFlag((response:any)=>
-                {
-                    //ゴーストモード
-                    let ghostModeFlag:Boolean = false;      //APIエラーでresponseがnullの場合、false固定
-                    if(response != null) ghostModeFlag = response.ghost_mode_flag;
+			// 	//ゴーストならゴースト登場
+            //     ExAPI.ghostModeFlag((response:any)=>
+            //     {
+            //         //ゴーストモード
+            //         let ghostModeFlag:Boolean = false;      //APIエラーでresponseがnullの場合、false固定
+            //         if(response != null) ghostModeFlag = response.ghost_mode_flag;
 
-					//通常の修行
-                    if(! ghostModeFlag)
-                    {
-                        StaticData.gameModeID = GameMode.HAYABEN;
+			// 		//通常の修行
+            //         if(! ghostModeFlag)
+            //         {
+            //             StaticData.gameModeID = GameMode.HAYABEN;
 
-						this._finishScreen.hideFinishTexts();
-						this._finishScreen.finishShow(()=>
-						{
-							cc.director.loadScene("game");
-						});
-                        return;
-                    }
+			// 			this._finishScreen.hideFinishTexts();
+			// 			this._finishScreen.finishShow(()=>
+			// 			{
+			// 				cc.director.loadScene("game");
+			// 			});
+            //             return;
+            //         }
 
-                    cc.log("ゴースト出現");
+            //         cc.log("ゴースト出現");
 
-                    //ゴースト出現演出とうんこ先生との会話
-                    let ghostScreenNode:cc.Node = cc.instantiate(this.ghostScreenPrefab);
-                    this.ghostScreenParentNode.addChild(ghostScreenNode);
-                    let ghostScreen:GhostScreen = ghostScreenNode.getComponent(GhostScreen);
-                    ghostScreen.setup(this.canvas, null, this._finishScreen.node, ()=>
-                    {
-                        StaticData.gameModeID = GameMode.GHOST;
+            //         //ゴースト出現演出とうんこ先生との会話
+            //         let ghostScreenNode:cc.Node = cc.instantiate(this.ghostScreenPrefab);
+            //         this.ghostScreenParentNode.addChild(ghostScreenNode);
+            //         let ghostScreen:GhostScreen = ghostScreenNode.getComponent(GhostScreen);
+            //         ghostScreen.setup(this.canvas, null, this._finishScreen.node, ()=>
+            //         {
+            //             StaticData.gameModeID = GameMode.GHOST;
 
-						this._finishScreen.hideFinishTexts();
-						this._finishScreen.finishShow(()=>
-						{
-							cc.director.loadScene("game");
-						});
-                    });
-                });
-			}
+			// 			this._finishScreen.hideFinishTexts();
+			// 			this._finishScreen.finishShow(()=>
+			// 			{
+			// 				cc.director.loadScene("game");
+			// 			});
+            //         });
+            //     });
+			// }
 			//-----------------------------
 			// メニューに戻る
 			else if(code == Result.RTN_SC_MENU)

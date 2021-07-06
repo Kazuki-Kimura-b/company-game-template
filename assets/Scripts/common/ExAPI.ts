@@ -1,3 +1,4 @@
+import AllKaitou from "../game/AllKaitou";
 import StaticData from "../StaticData";
 import APIAccess from "./APIAccess"
 import APIErrorPopup, { APIErrorType } from "./APIErrorPopup";
@@ -2233,6 +2234,24 @@ export default class SchoolAPI extends APIAccess
             }
             StaticData.playerData = res.json.playerData;
             StaticData.gameSetting = res.json.setting;
+            if (StaticData.gameSetting.isTestMode) {
+                let query: string = window.location.search.replace("?", "");
+                let settings: string[] = query.split("&");
+                for (let item of settings) {
+                    let tmp: string[] = item.split("=");
+                    switch (tmp[0]) {
+                        case "question":
+                            StaticData.gameSetting.specificQuestionNum = Number(tmp[1]);
+                            break;
+                        case "random":
+                            StaticData.gameSetting.isRandomQuestion = true;
+                            break;
+                        case "result":
+                            StaticData.gameSetting.specificQuestionNum = Number(tmp[1]);
+                            break;
+                    }
+                }
+            }
             cc.loader.loadRes("json/opponent", (err, res) => {
                 if (err) {
                     cc.log("opponentを読み込めませんでした");
