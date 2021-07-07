@@ -1,5 +1,4 @@
 import AnsButton from "../answerComponents/AnsButton";
-import BugTracking from "../common/BugTracking";
 import SchoolText from "../common/SchoolText";
 import SE from "../common/SE";
 import STFont from "../common/STFont";
@@ -125,7 +124,7 @@ export default class StoryScreen extends cc.Component
 
     /**
      * <callback>タグで汎用的なコールバックを返す
-     * @param callback 
+     * @param callback
      */
     public onStoryCommonCallback(callback:(code:string, subCode:string)=>void):void
     {
@@ -527,7 +526,7 @@ export default class StoryScreen extends cc.Component
         }
         else
         {
-            let speakerName:string = (character == StoryScreen.CHAR_IJIN) ? this._ijinName : "あなた";
+            let speakerName:string = (character == StoryScreen.CHAR_IJIN) ? this._ijinName : StaticData.playerData.name;
             let speakerLen:number = (character == StoryScreen.CHAR_IJIN) ? this._ijinNameLength : speakerName.length;
             
             this.nameOutput.resetText();

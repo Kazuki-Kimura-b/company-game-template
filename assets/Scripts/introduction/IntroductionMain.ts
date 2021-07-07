@@ -2,10 +2,11 @@ import NegaEffector from "../common/NegaEffector";
 import ExAPI from "../common/ExAPI";
 import SE from "../common/SE";
 import SystemIcon from "../common/SystemIcon";
-import FinishScreen, { FinishColor } from "../game/FinishScreen";
+import FinishScreen from "../game/FinishScreen";
 import CharaUnkoSensei from "../opening/CharaUnkoSensei";
-import StaticData, { GameMode } from "../StaticData";
 import StoryScreen from "./StoryScreen";
+import StaticData from "../StaticData";
+import UnkoGet from "../game/UnkoGet";
 
 const {ccclass, property} = cc._decorator;
 
@@ -31,6 +32,11 @@ export default class IntroductionMain extends cc.Component
     @property(cc.Prefab) finishScreenPrefab:cc.Prefab = null;
     @property(cc.Prefab) sceneLoadIndicator: cc.Prefab = null;
     @property(cc.Material) circleMaterial:cc.Material = null;
+    @property(cc.Prefab) unkoGetPrefab: cc.Prefab = null;
+    @property(cc.SpriteFrame) unko: cc.SpriteFrame = null;
+    @property(cc.Node) unkoParentNode: cc.Node = null;
+    @property(cc.Node) menuBoard: cc.Node = null;
+    @property(cc.Node) endButtons: cc.Node[] = [];
 
 
     private _sensei: CharaUnkoSensei = null;
@@ -45,13 +51,14 @@ export default class IntroductionMain extends cc.Component
         this._background = cc.instantiate(this.bgPrefab);
         this.bgParentNode.addChild(this._background);
 
-        if (StaticData.gameSetting.useNormalCharaIntro) {
-            // うんこ先生を読み込み
-            let usNode: cc.Node = cc.instantiate(this.charaUnkoSenseiPrefab);
-            this.unkoSenseiParentNode.addChild(usNode);
-            this._sensei = usNode.getComponent(CharaUnkoSensei);
-            this._sensei.setup();
+        // うんこ先生を読み込み
+        if (!StaticData.gameSetting.useCharaUnkosensei) {
+            this.unkoSenseiParentNode.active = false;
         }
+        let usNode: cc.Node = cc.instantiate(this.charaUnkoSenseiPrefab);
+        this.unkoSenseiParentNode.addChild(usNode);
+        this._sensei = usNode.getComponent(CharaUnkoSensei);
+        this._sensei.setup();
 
         //ゲーム画面を事前読み込み
         this.loadingBarNode.active = false;     //ローディングバーは非表示にしておく
@@ -130,15 +137,28 @@ export default class IntroductionMain extends cc.Component
         let fsNode:cc.Node = cc.instantiate(this.finishScreenPrefab);
         this.finishScreenParentNode.addChild(fsNode);
         this._finishScreen = fsNode.getComponent(FinishScreen);
-        this._finishScreen.setupWithClose(FinishColor.YELLOW, FinishColor.YELLOW);
 
+        if (StaticData.gameSetting.specificResultNum > 0) {
+            this._finishScreen.setupWithClose("end");
+            this._finishScreen.showFinishTexts();
+        } else {
+            this._finishScreen.setupWithClose("default");
+            this._finishScreen.hideFinishTexts();
+        }
 
-        if (!StaticData.playerData) {
+        if (!StaticData.opponentData.name) {
             ExAPI.importGameSettings(() => {
-                this._showStory();
+                // フィニッシュスクリーン（開始用）がはける
+                this._finishScreen.endFinishAction(()=>
+                {
+                    this._showStory();
+                });
             });
         } else {
-            this._showStory();
+            this._finishScreen.endFinishAction(()=>
+                {
+                    this._showStory();
+                });
         }
     }
 
@@ -164,13 +184,23 @@ export default class IntroductionMain extends cc.Component
      */
      private _showStory():void
     {
-        // フィニッシュスクリーン（開始用）がはける
-        this._finishScreen.endFinishAction(()=>
-        {
-        });
-
         // セリフの読み込み
-        cc.loader.loadRes("json/introductionScript", (err, res) => {
+        let fileName: string = null;
+        switch (StaticData.gameSetting.specificResultNum) {
+            case 0:
+                fileName = "introductionScript";
+                break;
+            case 1:
+                fileName = "endingScript1";
+                break;
+            case 2:
+                fileName = "endingScript2";
+                break;
+            case 3:
+                fileName = "endingScript3";
+                break;
+        }
+        cc.loader.loadRes(`json/${fileName}`, (err, res) => {
             if (err) {
                 "セリフの読み込みに失敗しました";
                 return;
@@ -184,15 +214,38 @@ export default class IntroductionMain extends cc.Component
             .delay(0.5)
             .call(()=>
             {
-                this.storyScreen.setupStory("うんこ{先生,せんせい}", script);
+                this.storyScreen.setupStory(StaticData.opponentData.name, script);
                 this.storyScreen.onComplete(()=>
                 {
-                    this._endIntroduction();
+                    if (StaticData.gameSetting.specificResultNum > 0) {
+                        this._endUnkoGet(() => {
+                            this._openMenu();
+                        });
+                    } else {
+                        this._endIntroduction();
+                    }
                 });
                 this.storyScreen.startStory();
             })
             .start();
         });
+    }
+
+    private _endUnkoGet(completeCallback: () => void): void {
+        let unkoGetNode:cc.Node = cc.instantiate(this.unkoGetPrefab);
+		let unkoGet:UnkoGet = unkoGetNode.getComponent(UnkoGet);
+		unkoGet.setup(this.unko, ()=>
+		{
+			unkoGetNode.removeFromParent();
+			completeCallback();
+		});
+
+		// this.frontEffect.node.addChild(unkoGetNode);
+        this.unkoParentNode.addChild(unkoGetNode);
+    }
+
+    private _openMenu(): void {
+        this.menuBoard.runAction(cc.moveTo(0.2, 0, -36));
     }
 
     /**
@@ -201,42 +254,87 @@ export default class IntroductionMain extends cc.Component
      private _endIntroduction():void
      {
          SE.bgmStop();
-
-         //挑戦か修行を選択
-         StaticData.gameModeID = GameMode.HAYABEN;
-         this._finishScreen.setupAtGameMode(StaticData.gameModeID);
+         this._finishScreen.setupAtGameMode("start");
          this._finishScreen.finishShow(()=>
          {
              this.loadingBarNode.active = true;      //ロードバーを出す
              SystemIcon.create(this.sceneLoadIndicator);     //読み込み中アイコン
              cc.director.loadScene("game");
          });
-         // });
+     }
+
+     private _hideButtons(num): void {
+         this.endButtons[num].runAction(cc.scaleTo(0.2, 0).easing(cc.easeCubicActionIn()));
+     }
+
+     private onPressTitleButton(): void {
+         this.node.runAction(
+             cc.sequence(
+                 cc.callFunc(() => {
+                    this._hideButtons(0);
+                    this._hideButtons(1);
+                    this._hideButtons(2);
+                 }),
+                 cc.delayTime(0.4),
+                 cc.callFunc(() => {cc.director.loadScene("title");})
+             )
+         )
+     }
+
+     private onPressOtherButton(): void {
+        this.node.runAction(
+            cc.sequence(
+                cc.callFunc(() => {
+                    this._hideButtons(0);
+                    this._hideButtons(1);
+                    this._hideButtons(2);
+                }),
+                cc.delayTime(1),
+                cc.callFunc(() => {
+                    this.menuBoard.runAction(cc.moveTo(0.4, 0, 832).easing(cc.easeCubicActionIn()));
+
+                })
+            )
+        )
+     }
+
+     private onPressEndButton(): void {
+        this.node.runAction(
+            cc.sequence(
+                cc.callFunc(() => {
+                   this._hideButtons(0);
+                   this._hideButtons(1);
+                   this._hideButtons(2);
+                }),
+                cc.delayTime(1),
+                cc.callFunc(() => {window.location.href = "https://unkogakuen.com"})
+            )
+        )
      }
 
 
     //タイムマシーンの演出開始
-    private _showTimeMachine(callback:()=>void):void
-    {
-        //positionYのゴールは 8 → -1.2
-        let posY_st:number = 8 - 4;
-        let posY_ed:number = -1.2 + 0.2;
+    // private _showTimeMachine(callback:()=>void):void
+    // {
+    //     //positionYのゴールは 8 → -1.2
+    //     let posY_st:number = 8 - 4;
+    //     let posY_ed:number = -1.2 + 0.2;
 
-        cc.tween({})
-        .to(2.0, {}, { onUpdate:(target:object, ratio: number)=>
-        {
-            let positionX:number = ratio * 0.2;
-            let positionY:number = ratio * (posY_ed - posY_st) + posY_st;
+    //     cc.tween({})
+    //     .to(2.0, {}, { onUpdate:(target:object, ratio: number)=>
+    //     {
+    //         let positionX:number = ratio * 0.2;
+    //         let positionY:number = ratio * (posY_ed - posY_st) + posY_st;
             
-            this.circleMaterial.setProperty("positionX", positionX);
-            this.circleMaterial.setProperty("positionY", positionY);
-        }})
-        .call(()=>
-        {
-            callback();
-        })
-        .start();
-    }
+    //         this.circleMaterial.setProperty("positionX", positionX);
+    //         this.circleMaterial.setProperty("positionY", positionY);
+    //     }})
+    //     .call(()=>
+    //     {
+    //         callback();
+    //     })
+    //     .start();
+    // }
 
     // update (dt) {}
 }

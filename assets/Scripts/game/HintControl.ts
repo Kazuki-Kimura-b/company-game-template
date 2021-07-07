@@ -320,11 +320,9 @@ export default class HintControl extends cc.Component {
 	{
 		//ヒントが常にあるモードの場合はヒントボタンは表示しない
 		if(this._alwayShowHint) return;
-		cc.log("ここですよ");
 
 		//ヒントが無い問題は表示しない
 		if(this._lockedHintDatas.length == 0) return;
-		cc.log("ここですか？");
 		this.hintSprite.node.active = true;
 		this.hintSprite.node.opacity = 255;
 

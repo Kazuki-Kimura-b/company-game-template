@@ -1,5 +1,5 @@
 import SE from "../common/SE";
-import { GameMode } from "../StaticData";
+import StaticData, { GameMode } from "../StaticData";
 
 const {ccclass, property} = cc._decorator;
 
@@ -27,23 +27,41 @@ export default class FinishScreen extends cc.Component {
     @property({type:cc.AudioClip}) seStart:cc.AudioClip = null;
     @property({type:cc.AudioClip}) seEnd:cc.AudioClip = null;
 
+    _defaultColor: cc.Color = cc.color(255, 255, 0);
+    _costomColor: cc.Color[] = [];
 
-    public setupAtGameMode(gameMode:GameMode):void
+    public setupAtGameMode(mode: string):void
     {
-        if (gameMode == GameMode.GORIBEN) this.setup(FinishColor.GORIBEN_L, FinishColor.GORIBEN_S);
-        else if (gameMode == GameMode.HAYABEN) this.setup(FinishColor.HAYABEN_L, FinishColor.HAYABEN_S);
-        else if (gameMode == GameMode.GHOST) this.setup(FinishColor.GHOST_L, FinishColor.GHOST_S);
+        switch (mode) {
+            case "default":
+                this.setup(this._defaultColor, this._defaultColor);
+                break;
+            case "start":
+                this.setup(StaticData.gameSetting.startColor1, StaticData.gameSetting.startColor2);
+                break;
+            case "end":
+                this.setup(StaticData.gameSetting.endColor1, StaticData.gameSetting.endColor2);
+                break;
+        }
     }
 
 
-    public setupWithCloseAtGameMode(gameMode:GameMode):void
+    public setupWithCloseAtGameMode(mode: string):void
     {
-        if (gameMode == GameMode.GORIBEN) this.setupWithClose(FinishColor.GORIBEN_L, FinishColor.GORIBEN_S);
-        else if (gameMode == GameMode.HAYABEN) this.setupWithClose(FinishColor.HAYABEN_L, FinishColor.HAYABEN_S);
-        else if (gameMode == GameMode.GHOST) this.setupWithClose(FinishColor.GHOST_L, FinishColor.GHOST_S);
+        switch (mode) {
+            case "default":
+                this.setup(this._defaultColor, this._defaultColor);
+                break;
+            case "start":
+                this.setup(StaticData.gameSetting.startColor1, StaticData.gameSetting.startColor2);
+                break;
+            case "end":
+                this.setup(StaticData.gameSetting.endColor1, StaticData.gameSetting.endColor2);
+                break;
+        }
     }
 
-    
+
     public setup(colorL:cc.Color, colorS:cc.Color):void
     {
         this._setup(colorL, colorS, 1800);
@@ -51,9 +69,19 @@ export default class FinishScreen extends cc.Component {
 
 
 
-    public setupWithClose(colorL:cc.Color, colorS:cc.Color):void
+    public setupWithClose(mode: string):void
     {
-        this._setup(colorL, colorS, 0);
+        switch (mode) {
+            case "default":
+                this._setup(this._defaultColor, this._defaultColor, 0);
+                break;
+            case "start":
+                this._setup(StaticData.gameSetting.startColor1, StaticData.gameSetting.startColor2, 0);
+                break;
+            case "end":
+                this._setup(StaticData.gameSetting.endColor1, StaticData.gameSetting.endColor2, 0);
+                break;
+        }
     }
 
 

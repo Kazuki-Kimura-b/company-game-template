@@ -1995,7 +1995,7 @@ export default class SchoolAPI extends APIAccess
      */
     public static exStart(gameMode:string, reference: string, callback:(response:any)=>void):void
     {
-        if (!StaticData.testMode) {
+        if (!StaticData.gameSetting.isTestMode) {
             this._aliveTokenCheck();        //トークンがあるか確認
             this._startAccessIcon();        //アイコンの表示
             
@@ -2082,7 +2082,7 @@ export default class SchoolAPI extends APIAccess
      */
      public static exResult(answers:{question_id:string, answer:string, correct_answer: string, required_time:number, hint:boolean}[], requestToken: string, callback:(response:any)=>void):void
      {
-        if (!StaticData.testMode) {
+        if (!StaticData.gameSetting.isTestMode) {
             this._aliveTokenCheck();        //トークンがあるか確認
             this._startAccessIcon();        //アイコンの表示
             
@@ -2160,7 +2160,7 @@ export default class SchoolAPI extends APIAccess
      */
      public static exEnd(requestToken: string, callback:(response:any)=>void):void
      {
-        if (!StaticData.testMode) {
+        if (!StaticData.gameSetting.isTestMode) {
             this._aliveTokenCheck();        //トークンがあるか確認
             this._startAccessIcon();        //アイコンの表示
             
@@ -2185,12 +2185,12 @@ export default class SchoolAPI extends APIAccess
                 {
                     let responseText:string = xhr.responseText;
                     response = JSON.parse(responseText);
-    
+
                     cc.log("EX RESULT REGISTER --------------");
                     cc.log(response);
-    
+
                     cc.log("RequestToken:" + response.token);
-    
+
                     if(response == null)
                     {
                         //エラーポップアップを表示し、リロードしてもらう
@@ -2225,41 +2225,41 @@ export default class SchoolAPI extends APIAccess
         }
      }
 
-     public static importGameSettings(callback:()=>void): void {
+    public static importGameSettings(callback:()=>void): void {
         //  jsonの読み込み
-        cc.loader.loadRes("json/setting", (err, res) => {
+        if (StaticData.gameSetting.isTestMode) {
+            let query: string = window.location.search.replace("?", "");
+            let settings: string[] = query.split("&");
+            for (let item of settings) {
+                let tmp: string[] = item.split("=");
+                switch (tmp[0]) {
+                    case "question":
+                        StaticData.gameSetting.specificQuestionNum = Number(tmp[1]);
+                        break;
+                    case "random":
+                        StaticData.gameSetting.isRandomQuestion = true;
+                        break;
+                    case "result":
+                        StaticData.gameSetting.specificResultNum = Number(tmp[1]);
+                        break;
+                }
+                cc.log(tmp);
+            }
+            cc.log(StaticData.gameSetting);
+        } else {
+            let query: string = window.location.search.replace("?", "");
+            let tmp: string[] = query.split("=");
+            if (tmp[0] === "rf") {
+                StaticData.gameSetting.reference = tmp[1];
+            }
+        }
+        cc.loader.loadRes("json/opponent", (err, res) => {
             if (err) {
-                cc.log("settingを読み込めませんでした");
+                cc.log("opponentを読み込めませんでした");
                 return;
             }
-            StaticData.playerData = res.json.playerData;
-            StaticData.gameSetting = res.json.setting;
-            if (StaticData.gameSetting.isTestMode) {
-                let query: string = window.location.search.replace("?", "");
-                let settings: string[] = query.split("&");
-                for (let item of settings) {
-                    let tmp: string[] = item.split("=");
-                    switch (tmp[0]) {
-                        case "question":
-                            StaticData.gameSetting.specificQuestionNum = Number(tmp[1]);
-                            break;
-                        case "random":
-                            StaticData.gameSetting.isRandomQuestion = true;
-                            break;
-                        case "result":
-                            StaticData.gameSetting.specificQuestionNum = Number(tmp[1]);
-                            break;
-                    }
-                }
-            }
-            cc.loader.loadRes("json/opponent", (err, res) => {
-                if (err) {
-                    cc.log("opponentを読み込めませんでした");
-                    return;
-                }
-                StaticData.opponentCPUs = res.json;
-                callback();
-            })
-        });
-     }
+            StaticData.opponentData = res.json;
+            callback();
+        })
+    }
 }

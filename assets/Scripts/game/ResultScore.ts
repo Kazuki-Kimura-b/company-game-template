@@ -235,10 +235,10 @@ export default class ResultHayaben extends Result {
         let prevCoin:number = total_coin - coin;
 
         //ステータスの更新（メニュー画面に戻った時用）
-        StaticData.playerData.level = current_level;
-        StaticData.playerData.coin = total_coin;
-        StaticData.playerData.next_level_progress = next_level_progress;
-        StaticData.playerData.score_magnification = score_magnification;
+        // StaticData.playerData.level = current_level;
+        // StaticData.playerData.coin = total_coin;
+        // StaticData.playerData.next_level_progress = next_level_progress;
+        // StaticData.playerData.score_magnification = score_magnification;
 
 
 
@@ -1006,7 +1006,7 @@ export default class ResultHayaben extends Result {
     private _showStatusUp(callback:()=>void):void
     {
         //let myPower:number = Math.floor(400 * StaticData.playerData.score_magnification);
-        let myPower:number = StaticData.playerData.maxPower;
+        let myPower:number = 0;
         
         //ステータスバーのパワーが上昇
         this._playerStatusBar.toPower(myPower, 0.5, ()=>{});

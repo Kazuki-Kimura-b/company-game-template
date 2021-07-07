@@ -24,7 +24,7 @@ export default class ScoreBar extends cc.Component
         {
             this.resultSprites[i].spriteFrame = this.resNotSpriteFrame;
         }
-        this.nameOutput.string = StaticData.playerData.nickname;
+        this.nameOutput.string = StaticData.playerData.name;
         this.scoreCounter.resetNum();
     }
 

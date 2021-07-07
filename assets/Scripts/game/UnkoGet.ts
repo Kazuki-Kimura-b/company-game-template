@@ -25,8 +25,7 @@ export default class UnkoGet extends cc.Component
     private _onCompleteCallback:()=>void = null;
 
 
-    // data 使わなくていいので外すかも
-    public setup(data:CollectionItem, onCompleteCallback:()=>void):void
+    public setup(unko: cc.SpriteFrame, onCompleteCallback:()=>void):void
     {
         this._onCompleteCallback = onCompleteCallback;
         
@@ -38,12 +37,7 @@ export default class UnkoGet extends cc.Component
         this.tapNextIcon.active = false;
         this.hukidashiNode.active = false;
 
-        let message:string = StaticData.ijinData.unko_get_script;
-        if(message == null)
-        {
-            if(StaticData.DEBUG_DUMMY_STORIES) message = "すごいなあ。\n居間に飾っておこう。";
-            else message = "null";
-        }
+        let message:string = StaticData.opponentData.unko_get_script;
 
         let textFormat:STFormat = STFormat.create(
         {
@@ -61,12 +55,8 @@ export default class UnkoGet extends cc.Component
         this.messageOutput.createText(message, textFormat);
         this.messageOutput.hideText();
 
-        //SchoolAPI.loadImage("unko", data.unko_url, (response:any)=>
-        SchoolAPI.loadImage("unko", StaticData.ijinData.ijin_unko_image_url, (response:any)=>
-        {
-            this.unkoSprite.spriteFrame = response.image;
-            this._showStart();
-        });
+        this.unkoSprite.spriteFrame = unko;
+        this._showStart();
     }
 
 
