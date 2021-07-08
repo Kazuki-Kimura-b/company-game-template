@@ -218,16 +218,16 @@
     },
     "userIconSpriteFrames": [
       {
-        "__uuid__": "a2d619eb-234b-423b-b9b5-ac7851fd49f8"
+        "__uuid__": "78cca036-b771-4b01-be59-a728cc389292"
       },
       {
-        "__uuid__": "bafe0d9b-92a9-4e28-be26-720800399959"
+        "__uuid__": "3a33b2e3-5141-44a3-b922-b959d2c20365"
       },
       {
-        "__uuid__": "e17bad94-ba5c-4fcd-ac1c-55bf27312e73"
+        "__uuid__": "3000de86-77bf-498d-809e-c59eb56396fb"
       },
       {
-        "__uuid__": "e96385fd-068e-452b-b006-76ec27760687"
+        "__uuid__": "d25755ea-4412-4bbd-ba06-63af05fe5fce"
       }
     ],
     "finishScreenParentNode": {
@@ -908,9 +908,7 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_spriteFrame": {
-      "__uuid__": "f3d3dd2b-16b7-4d0d-9a46-c229b110f230"
-    },
+    "_spriteFrame": null,
     "_type": 0,
     "_sizeMode": 0,
     "_fillType": 0,

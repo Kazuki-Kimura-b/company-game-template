@@ -30,7 +30,6 @@ export default class AC extends cc.Component {
 	protected _answerCallback: (answerCode:number, answer:string)=>void = null;
 	protected _questionOutput: SchoolText = null;
 	protected _imageSprite :cc.Sprite = null;
-	protected _debugImageSpriteRectNode: cc.Node = null;
 	protected _btnEnter :cc.Button = null;
 	protected _btnReset :cc.Button = null;
 	protected _answerGuide :AnswerGuide = null;
@@ -106,7 +105,6 @@ export default class AC extends cc.Component {
 
 		this._questionOutput = questionWindow.questionOutput;		//問題テキスト(MySchoolText)
 		this._imageSprite = questionWindow.imageSprite;			//画像表示用のスプライト
-		this._debugImageSpriteRectNode = questionWindow.debugImageSpriteRectNode;
         this._btnEnter = questionWindow.btnEnter;
 		this._btnReset = questionWindow.btnReset;
 		this._answerGuide = questionWindow.answerGuide;
@@ -525,14 +523,6 @@ export default class AC extends cc.Component {
 
 		this._imageSprite.node.width = imgSize.width * scale;
 		this._imageSprite.node.height = imgSize.height * scale;
-
-		if(this._debugImageSpriteRectNode.active)
-		{
-			this._debugImageSpriteRectNode.width = this._imageSprite.node.width;
-			this._debugImageSpriteRectNode.height = this._imageSprite.node.height;
-			this._debugImageSpriteRectNode.color = (largeZuhan) ? cc.color(255, 0, 0) : cc.color(0, 0, 255);
-		}
-
 
 		//this._imageSprite.node.y = lPos.y - imgSize.height / 2;
 		this._imageSprite.node.y = lPos.y - this._imageSprite.node.height / 2;

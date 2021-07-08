@@ -39,7 +39,6 @@ export default class QuestionWindow extends cc.Component
     @property(TimeBoard) timeBoard: TimeBoard = null;
     @property(AnswerGuide) answerGuide: AnswerGuide = null;
     @property(cc.Sprite) imageSprite: cc.Sprite = null;
-    @property(cc.Node) debugImageSpriteRectNode: cc.Node = null;
     @property(cc.Label) idLevelOutput: cc.Label = null;
     @property(cc.Button) btnEnter: cc.Button = null;
 	@property(cc.Button) btnReset: cc.Button = null;
@@ -67,7 +66,6 @@ export default class QuestionWindow extends cc.Component
 
         this.idLevelOutput.node.parent.active = StaticData.DEVELOP_MODE;
         this.imageSprite.node.active = false;
-		this.debugImageSpriteRectNode.active = StaticData.DEBUG_SHOW_QUESTION_IMAGE_RECT;		//デバッグ　画像の表示範囲を視覚化
         this.formatDisplay.node.active = false;
         this.btnEnter.interactable = false;
 		this.btnEnter.node.active = false;
