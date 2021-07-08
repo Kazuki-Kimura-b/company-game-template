@@ -1,5 +1,3 @@
-import { CollectionItem } from "../common/Models";
-import SchoolAPI from "../common/SchoolAPI";
 import SchoolText from "../common/SchoolText";
 import SE from "../common/SE";
 import STFormat from "../common/STFormat";

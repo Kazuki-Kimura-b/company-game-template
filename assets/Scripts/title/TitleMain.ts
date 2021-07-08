@@ -34,17 +34,6 @@ export default class TitleMain extends cc.Component {
         this.startButton.active = false;
         ExAPI.importGameSettings(() => {
             this.startButton.active = true;
-
-            if (StaticData.testMode) {
-                cc.log("テストモード");
-            } else {
-                // 本番環境
-                let rf: string = window.location.search;
-                if (rf) {
-                    rf = rf.slice(1);
-                    StaticData.reference = rf;
-                }
-            }
         });
 
         // シーンを事前に読み込む

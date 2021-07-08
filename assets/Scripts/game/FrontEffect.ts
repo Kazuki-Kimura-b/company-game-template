@@ -1,6 +1,4 @@
 import AC from "../answerComponents/AC";
-import SchoolAPI from "../common/SchoolAPI";
-import VSScreen from "./VSScreen";
 
 const {ccclass, property} = cc._decorator;
 
@@ -18,16 +16,6 @@ export default class FrontEffect extends cc.Component {
     @property(cc.Node) loadingNode: cc.Node = null;
     @property(cc.Node) loadingUnkoIcon: cc.Node = null;
     @property(cc.Node) backCoverNode: cc.Node = null;
-    @property(cc.Prefab) VSScreenPrefab: cc.Prefab = null;
-
-    private _vsScreen:VSScreen = null;
-    private _vsScreenStatus:number = 0;
-    private _vsSelectedItemIDs:number[] = [];
-
-    private static readonly VSSCREEN_STATUS_IN:number = 0;
-    private static readonly VSSCREEN_STATUS_WAIT:number = 1;
-    private static readonly VSSCREEN_STATUS_OUT:number = 2;
-
 
     /**
      * 初期化

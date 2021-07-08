@@ -1,22 +1,7 @@
 import SE from "../common/SE";
-import StaticData, { GameMode } from "../StaticData";
+import StaticData from "../StaticData";
 
 const {ccclass, property} = cc._decorator;
-
-
-export class FinishColor
-{
-    public static readonly YELLOW:cc.Color = cc.color(255,255,0);
-    public static readonly GORIBEN_S:cc.Color = cc.color(255,0,140);        //多分あってる
-    public static readonly GORIBEN_L:cc.Color = cc.color(0,225,205);        //多分あってる
-    public static readonly HAYABEN_S:cc.Color = cc.color(255,0,140);
-    public static readonly HAYABEN_L:cc.Color = cc.color(0,40,255);
-    public static readonly GHOST_S:cc.Color = cc.color(158,90,255);
-    public static readonly GHOST_L:cc.Color = cc.color(255,240,0);
-
-}
-
-
 
 @ccclass
 export default class FinishScreen extends cc.Component {

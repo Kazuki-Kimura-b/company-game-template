@@ -1,9 +1,8 @@
-import AllKaitou from "../game/AllKaitou";
 import StaticData from "../StaticData";
 import APIAccess from "./APIAccess"
 import APIErrorPopup, { APIErrorType } from "./APIErrorPopup";
 import BugTracking from "./BugTracking";
-import { CollectionItem, ComboRanking, ConfirmatoryExamFlag, CPUData, GetGameItem, GoribenItem, NavigatorConversations, OpponentCPU, PlayerData, SchoolEnd, UseGameItem } from "./Models";
+import { CollectionItem, ComboRanking, ConfirmatoryExamFlag, CPUData, GetGameItem, GoribenItem, NavigatorConversations, OpponentCPU, PlayerData, UseGameItem } from "./Models";
 import SystemIcon from "./SystemIcon";
 
 const {ccclass, property} = cc._decorator;
@@ -1382,109 +1381,6 @@ export default class SchoolAPI extends APIAccess
 
 
 
-    /**
-     * ゲーム終了用エンドポイント
-     */
-    public static schoolEnd(mainCpuScore:number, requestToken:string, callback:(response:SchoolEnd)=>void)
-    {
-        if(this._DUMMY_DATA_MODE)
-        {
-            this._dummySchoolEnd(callback);
-            return;
-        }
-
-        this._aliveTokenCheck();        //トークンがあるか確認
-        this._startAccessIcon();        //アイコンの表示
-
-        if(requestToken == "" || requestToken == null || requestToken == undefined)
-        {
-            BugTracking.notify("問題リクエストトークンが無いエラー", "SchoolAPI.schoolEnd()",
-            {
-                msg: "問題リクエストトークンが無いエラー/SchoolAPI.schoolEnd()",
-                requestToken: requestToken
-            });
-        }
-        
-        let xhr:XMLHttpRequest = new XMLHttpRequest();
-		let url:string = this.staticGetHost() + "/api/v1/study/end";
-        xhr.open( 'POST', url, true );
-        // POST 送信の場合は Content-Type は固定.
-        xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
-        xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
-        xhr.timeout = SchoolAPI.TIME_OUT;
-
-        xhr.onload = (ev:ProgressEvent<EventTarget>)=>
-        {
-            this._closeAccessIcon();        //アイコンを消す
-            
-            cc.log(xhr.status);
-            let response:SchoolEnd = null;
-
-			if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200)
-            {
-				let responseText:string = xhr.responseText;
-                let json:any = JSON.parse(responseText);
-                cc.log(json);
-
-                if(json == null)
-                {
-                    cc.log("GAME END RESPONSE ---------------");
-                    BugTracking.apiError("ゲーム終了エラー(B)", url, xhr, { mainCpuScore:mainCpuScore, requestToken:requestToken, responseText:responseText });
-
-                    //エラーポップアップを表示し、リロードしてもらう
-                    this._errorPopup(APIErrorType.FAILED_RETRY, ()=>
-                    {
-                        this.schoolEnd(mainCpuScore, requestToken, callback);
-                    });
-                }
-                else
-                {
-                    let cItem:any = json.collections;
-                    let collections:CollectionItem = null;
-
-                    if(cItem != null)
-                    {
-                        collections = new CollectionItem(cItem.subgenre, cItem.name, cItem.description, cItem.unko_url, cItem.position, cItem.trigger);
-                    }
-                    response = new SchoolEnd(json.accuracy_num, json.scoring_total, json.max_scoring_total, json.accuracy_score, json.answers, json.time_score, json.hint_score, json.combo_score, json.time_total, json.coin, json.total_coin, json.experience_point, json.level_up, json.old_level, json.current_level, json.next_level_progress, json.next_level_before_progress, json.high_score, json.score_magnification, json.experience_point_magnification, json.continual_combo, json.acquired_newest_ijin_unko_file_url, json.ghost_date, collections);
-                    
-                    if(response.answers.length != 10)
-                    {
-                        BugTracking.apiError("サーバからの回答結果が10問でない", url, xhr, { api_answers:response.answers });
-                        
-                        //エラーポップアップを表示し、終了
-                        this._errorPopup(APIErrorType.FAILED_CLOSE, ()=>{});
-                        return;
-                    }
-                    
-                    callback(response);
-                }
-            }
-            else
-            {
-                BugTracking.apiError("ゲーム終了エラー", url, xhr, { mainCpuScore:mainCpuScore, requestToken:requestToken });
-
-                //エラーポップアップを表示し、通信ボタンで再度アクセスしてもらう
-                this._errorPopup(APIErrorType.FAILED_RETRY, ()=>
-                {
-                    this.schoolEnd(mainCpuScore, requestToken, callback);
-                });
-            }
-        };
-        xhr.onerror = xhr.ontimeout = (ev:ProgressEvent<EventTarget>)=>
-        {
-            this._closeAccessIcon();        //アイコンを消す
-            
-            //再接続
-            this._errorPopup(APIErrorType.OFFLINE, ()=>
-            {
-                this.schoolEnd(mainCpuScore, requestToken, callback);
-            });
-            //console.error(xhr.statusText);
-        };
-		xhr.send('token=' + requestToken + '&main_cpu_score=' + mainCpuScore);
-    }
-
 
 
 
@@ -1935,35 +1831,6 @@ export default class SchoolAPI extends APIAccess
     }
 
 
-    private static _dummySchoolEnd(callback:(response:SchoolEnd)=>void):void
-    {
-        callback(new SchoolEnd(
-            1,  //正解数
-            180, //トータルスコア
-            400, //とれる最高得点
-            80, //正解点
-            {}, //サーバに送信した回答情報(回答までにかかった時間など)
-            40,  //スピード点
-            0,  //ヒントボーナス
-            60,  //コンボボーナス
-            1.0,    //回答にかかった時間のトータル
-            20,      //取得したコイン
-            100,      //取得後の所持コイン数
-            40,      //獲得経験値
-            !true,  //レベルアップ
-            2,      //旧レベル
-            3,      //経験値ゲット後のレベル
-            80,      //レベルアップまでの残り経験値
-            40,      //レベルアップまでの残り経験値（経験値取得前）
-            50,     //ハイスコア
-            1.0,    //天才パワーによるスコアブースト
-            12,    //ごりべん進捗度による現在の経験値倍率(12)
-            0,      //連続コンボ数,
-            "https://unko-qadb.s3-ap-northeast-1.amazonaws.com/collection/001_unko.png",     //獲得している偉人の中で最新の偉人のうんこ画像URL
-            "4月1日",       //対戦したゴーストの日付
-            null    //ゲットしたうんこ情報
-        ));
-    }
 
 
     private static _dummyConfirmatoryExamScripts(category:string, callback:(response:NavigatorConversations)=>void):void
