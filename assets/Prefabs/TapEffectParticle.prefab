@@ -91,7 +91,7 @@
     "_custom": true,
     "_file": null,
     "_spriteFrame": {
-      "__uuid__": "7a7b3594-a9ae-4be5-b8e0-e0ac455f2285"
+      "__uuid__": "61a1a2ce-5cd9-40f7-ba97-7ed7db672c35"
     },
     "_texture": {
       "__uuid__": "930f5a58-15c0-4a44-8a2b-414cb94d71b8"
@@ -184,7 +184,7 @@
     "asset": {
       "__uuid__": "30c6ba42-97f0-4431-a63c-0607dead620b"
     },
-    "fileId": "47OR6WsdhHKrJrvX1ZAYU0",
+    "fileId": "",
     "sync": false
   }
 ]

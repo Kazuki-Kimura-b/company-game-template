@@ -169,7 +169,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "97f8660b-76aa-4849-a2df-04a0dcff8032"
+      "__uuid__": "d575e8df-0b36-4b76-b0b8-9b9f64324feb"
     },
     "_type": 0,
     "_sizeMode": 1,
@@ -182,7 +182,9 @@
     "_fillStart": 0,
     "_fillRange": 0,
     "_isTrimmedMode": true,
-    "_atlas": null,
+    "_atlas": {
+      "__uuid__": "6ad70279-ae4a-454a-b48d-ac5012ff2180"
+    },
     "_id": ""
   },
   {
@@ -276,7 +278,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "de48dfe6-688b-4706-999b-d0dbcf00042e"
+      "__uuid__": "8556a219-3292-4f5e-985d-d28ac0b7b7d0"
     },
     "_type": 0,
     "_sizeMode": 0,
@@ -289,7 +291,9 @@
     "_fillStart": 0,
     "_fillRange": 0,
     "_isTrimmedMode": true,
-    "_atlas": null,
+    "_atlas": {
+      "__uuid__": "6ad70279-ae4a-454a-b48d-ac5012ff2180"
+    },
     "_id": ""
   },
   {
@@ -383,7 +387,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "fca090aa-4f2d-4325-98b0-ae6808ff01fc"
+      "__uuid__": "b883f37c-fdd7-4953-bdc0-bf89d25b2829"
     },
     "_type": 0,
     "_sizeMode": 1,
@@ -396,7 +400,9 @@
     "_fillStart": 0,
     "_fillRange": 0,
     "_isTrimmedMode": true,
-    "_atlas": null,
+    "_atlas": {
+      "__uuid__": "6ad70279-ae4a-454a-b48d-ac5012ff2180"
+    },
     "_id": ""
   },
   {
@@ -490,7 +496,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "fb928d50-39ed-4cde-9a70-311c881a63cb"
+      "__uuid__": "8e157f5d-8d8f-44fd-b499-c5e3846a5666"
     },
     "_type": 0,
     "_sizeMode": 0,
@@ -503,7 +509,9 @@
     "_fillStart": 0,
     "_fillRange": 0,
     "_isTrimmedMode": true,
-    "_atlas": null,
+    "_atlas": {
+      "__uuid__": "6ad70279-ae4a-454a-b48d-ac5012ff2180"
+    },
     "_id": ""
   },
   {
@@ -733,7 +741,8 @@
         "__uuid__": "eca5d2f2-8ef6-41c2-bbe6-f9c79d09c432"
       }
     ],
-    "_useOriginalSize": false,
+    "_srcBlendFactor": 770,
+    "_dstBlendFactor": 771,
     "_string": "ヒントを見る",
     "_N$string": "ヒントを見る",
     "_fontSize": 20,
@@ -743,6 +752,8 @@
     "_isSystemFontUsed": true,
     "_spacingX": 0,
     "_batchAsBitmap": false,
+    "_styleFlags": 0,
+    "_underlineHeight": 0,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
@@ -839,6 +850,8 @@
       "__id__": 14
     },
     "_enabled": true,
+    "_normalMaterial": null,
+    "_grayMaterial": null,
     "duration": 0.1,
     "zoomScale": 1.2,
     "clickEvents": [
@@ -960,10 +973,10 @@
       "__id__": 22
     },
     "left2LineSpriteFrame": {
-      "__uuid__": "10717617-11fc-4719-bea7-e24a043312a4"
+      "__uuid__": "ad380c1b-c35d-467b-9914-187ca282dc6f"
     },
     "right2LineSpriteFrame": {
-      "__uuid__": "c98f8a8e-153d-4166-bc84-f443c3e73901"
+      "__uuid__": "675d7f8a-80f3-4373-8588-582cf4f972d6"
     },
     "_id": ""
   },
@@ -975,7 +988,7 @@
     "asset": {
       "__uuid__": "51205273-5181-4feb-84a7-4ee904be7be2"
     },
-    "fileId": "e2y9nsNg5AB4i+8NModjY6",
+    "fileId": "",
     "sync": false
   }
 ]
