@@ -219,62 +219,6 @@ export class UseGameItem
 }
 
 
-
-export class SchoolEnd
-{
-    constructor(
-        /** 正答数 */
-        public accuracy_num:number,
-        /** 各種スコアの合計(モード毎に算出条件が異なる) */
-        public scoring_total:number,
-        /** 各種スコア合計の最大値 */
-        public max_scoring_total:number,
-        /** 正解得点 */
-        public accuracy_score:number,
-        /**  */
-        public answers:any,
-        /** スピード得点 */
-        public time_score:number,
-        /** ノーヒント得点 */
-        public hint_score:number,
-        /** コンボ得点 */
-        public combo_score:number,
-        /** 各問題にかかった合計時間(各問題のログから算出) */
-        public time_total:number,
-        /** 今回のゲームプレイで獲得したコイン */
-        public coin:number,
-        /** 子供の保有コイン数(今回のゲームプレイで獲得したコインも含む) */
-        public total_coin:number,
-        /** 今回のゲームで獲得した経験値 */
-        public experience_point:number,
-        /** 今回のプレイでレベルか上がったかどうか */
-        public level_up:boolean,
-        /** 今回のプレイ前のレベル */
-        public old_level:number,
-        /** 今回のプレイ後の現在のレベル */
-        public current_level:number,
-        /** 次のレベルまでの進捗度(%) */
-        public next_level_progress:number,
-        /** ゲームプレイ前の次のレベルまでの進捗度(%) */
-        public next_level_before_progress:number,
-        /** ハイスコア(ゴーストではゴーストのスコアを返す) */
-        public high_score:number,
-        /** レベルに応じた得点倍率 */
-        public score_magnification:number,
-        /** ごりべん進捗度による現在の経験値倍率 */
-        public experience_point_magnification:number,
-        /** 連続コンボ数 */
-        public continual_combo:number,
-        /** 獲得している偉人の中で最新の偉人のうんこ画像URL */
-        public acquired_newest_ijin_unko_file_url:string,
-        /** 対戦相手のゴーストの日付 */
-        public ghost_date:string,
-        /** 今回取得したコレクション */
-        public collections:CollectionItem
-    ){}
-}
-
-
 export class CollectionItem
 {
     constructor(

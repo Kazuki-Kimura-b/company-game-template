@@ -91,6 +91,7 @@ interface GameSetting {
     specificQuestionNum: number, // 特定の問題のID
     specificResultNum: number, // 特定の結果画面のID
     reference: string,
+    useGameCharacter: boolean, // ゲーム画面で右下にキャラを表示するかどうか
     useCharaUnkosensei: boolean // 汎用うんこ先生を使うかどうか
 }
 
@@ -224,6 +225,7 @@ export default class StaticData {
         endColor2: new cc.Color(0, 168 , 108),
         isRandomQuestion: false, // テスト時は、リファラで設定する
         isTestMode: true, // テストモードかどうか
+        useGameCharacter: false,
         useCharaUnkosensei: false,
 
         /* 以下は自分で設定しない。リファラから取得する */

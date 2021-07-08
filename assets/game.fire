@@ -87,12 +87,6 @@
       },
       {
         "__id__": 91
-      },
-      {
-        "__id__": 92
-      },
-      {
-        "__id__": 93
       }
     ],
     "_prefab": null,
@@ -169,7 +163,7 @@
     "imgLoadErrorSpriteFrame": {
       "__uuid__": "13766b05-0c23-4e52-984a-61b31d8ec1ac"
     },
-    "ijinScreenNode": {
+    "ijinNode": {
       "__id__": 10
     },
     "ijinScreen": {
@@ -189,15 +183,6 @@
     },
     "scoreBarPrefab": {
       "__uuid__": "422102e9-82fb-41bb-a520-6c449843127c"
-    },
-    "resultScorePrefab": {
-      "__uuid__": "0e4ab9f7-6cc7-4fe0-aa85-76674b2dcf27"
-    },
-    "resultGoribenPrefab": {
-      "__uuid__": "00e898aa-1ae0-4576-9455-a92c56eb16d2"
-    },
-    "resultGhostPrefab": {
-      "__uuid__": "404ed50d-4a47-469d-9f6b-445c859fc9ca"
     },
     "comboDisp": {
       "__id__": 51
@@ -243,7 +228,94 @@
       },
       {
         "__uuid__": "e96385fd-068e-452b-b006-76ec27760687"
-      }
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     ],
     "finishScreenParentNode": {
       "__id__": 74
@@ -269,29 +341,8 @@
     "kaisetsuWindowParentNode": {
       "__id__": 72
     },
-    "unkoGetPrefab": {
-      "__uuid__": "2fdc1a87-2c6b-4e2c-9f8a-260a5e9d4a05"
-    },
-    "allKaitouPrefab": {
-      "__uuid__": "95607540-a1ec-4582-8ff5-b049ceda6b72"
-    },
     "storyScreenPrefab": {
       "__uuid__": "bcf48542-d29e-4922-91be-6cbc60b18c4f"
-    },
-    "vsScreenPrefab": {
-      "__uuid__": "4da6082f-723b-4cdb-a790-a89a70c556fc"
-    },
-    "comboRankingPrefab": {
-      "__uuid__": "e4196e42-81fc-46f3-91b7-ab38a4ac26d9"
-    },
-    "playerStatusBarPrefab": {
-      "__uuid__": "5689e8fb-7ca6-415e-9153-b125f3cb8097"
-    },
-    "nextIjinWarpPrefab": {
-      "__uuid__": "8112e10d-b023-45e8-894a-4c470be80108"
-    },
-    "sceneLoadIndicator": {
-      "__uuid__": "2e4a7546-94fa-4051-adc6-05e7c814a6be"
     },
     "questionWindowPrefab": {
       "__uuid__": "2d395770-473a-48d4-a501-a58ee8be330d"
@@ -4306,54 +4357,6 @@
       "__uuid__": "84c1d0db-99db-4ed6-86ff-752d2984df07"
     },
     "_id": "33KvCGyPFOI50Vti/2Dk48"
-  },
-  {
-    "__type__": "6b2bbFarkxPxqViltmT+IOp",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 2
-    },
-    "_enabled": true,
-    "coverNode": {
-      "__id__": 84
-    },
-    "buttons": [],
-    "_id": "47RIEDzUZOupQPjKdx0Wab"
-  },
-  {
-    "__type__": "3280dj8fIhLFJ6/LAvdQ1SD",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 2
-    },
-    "_enabled": true,
-    "dummyQ1ChinaImg": {
-      "__uuid__": "bac1af1b-2519-4ae8-bd5a-41afbde4c2a5"
-    },
-    "dummyQ1JapanImg": {
-      "__uuid__": "1b26e743-55dc-403a-983e-84694cf95e4d"
-    },
-    "dummyQ2TenkaiImg": {
-      "__uuid__": "e74c733f-ead8-424c-9ba5-b3d23370ee77"
-    },
-    "dummyQ2RokkakuImg": {
-      "__uuid__": "74ba9e98-b5cc-4caa-920d-8ba84e63fc7f"
-    },
-    "dummyQ2GokakuImg": {
-      "__uuid__": "3f28f2b5-e749-43d9-a279-0b05f01f2776"
-    },
-    "dummyQ3ToiImg": {
-      "__uuid__": "25f30210-0cf0-4652-b2fe-1ad19cb2aa80"
-    },
-    "dummyIjinImg": {
-      "__uuid__": "9a9ffc60-89a9-4946-9d2e-c4782fe22fc3"
-    },
-    "dummyBGImg": {
-      "__uuid__": "2fa99a89-82dc-4065-83fe-5840b3de0d97"
-    },
-    "_id": "e6gMbUpDBD95OUEjzGqNoU"
   },
   {
     "__type__": "985c4toGtJB0K1Lu2FiUnz1",

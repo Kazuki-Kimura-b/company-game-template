@@ -47,7 +47,7 @@ export default class QuestionWindow extends cc.Component
     @property(cc.Prefab) questionFontPrefab:cc.Prefab = null;			//問題と回答ボタンで使用するSTFont情報
     @property(cc.SpriteFrame) imgLoadErrorSpriteFrame: cc.SpriteFrame = null;
     @property(cc.SpriteFrame) schoolTextUnderlineSpriteFrame: cc.SpriteFrame = null;
-    
+
 
     private _questionWindowY :number = -1;
     private _answerComponents: {} = {};
@@ -67,7 +67,7 @@ export default class QuestionWindow extends cc.Component
 
         this.idLevelOutput.node.parent.active = StaticData.DEVELOP_MODE;
         this.imageSprite.node.active = false;
-		this.debugImageSpriteRectNode.active = StaticData.DEBUG_SHOW_QUESTION_IMAGE_RECT || StaticData.previewMode;		//デバッグ　画像の表示範囲を視覚化
+		this.debugImageSpriteRectNode.active = StaticData.DEBUG_SHOW_QUESTION_IMAGE_RECT;		//デバッグ　画像の表示範囲を視覚化
         this.formatDisplay.node.active = false;
         this.btnEnter.interactable = false;
 		this.btnEnter.node.active = false;
@@ -240,9 +240,6 @@ export default class QuestionWindow extends cc.Component
     {
         //答え方のガイドを表示
 		this.answerGuide.showAtFormat(format);
-
-		//プレビューモードはタイマー動かさない
-		if(StaticData.previewMode) return;
 		
 		//タイマーが動き出す
 		this.timeBoard.startTimer(
