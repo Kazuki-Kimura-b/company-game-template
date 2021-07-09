@@ -39,7 +39,6 @@ export default class QuestionWindow extends cc.Component
     @property(TimeBoard) timeBoard: TimeBoard = null;
     @property(AnswerGuide) answerGuide: AnswerGuide = null;
     @property(cc.Sprite) imageSprite: cc.Sprite = null;
-    @property(cc.Label) idLevelOutput: cc.Label = null;
     @property(cc.Button) btnEnter: cc.Button = null;
 	@property(cc.Button) btnReset: cc.Button = null;
     @property(cc.Node) answerComponentsParentNode: cc.Node = null;
@@ -64,7 +63,6 @@ export default class QuestionWindow extends cc.Component
 
         this._questionWindowY = this.node.y;
 
-        this.idLevelOutput.node.parent.active = StaticData.DEVELOP_MODE;
         this.imageSprite.node.active = false;
         this.formatDisplay.node.active = false;
         this.btnEnter.interactable = false;
@@ -157,9 +155,6 @@ export default class QuestionWindow extends cc.Component
         
         //問題の上に何問目か小さく表示
         this.questionNumOutput.string = "第" + (qNum + 1) + "問:" + qData.subject;
-
-        //デバッグで問題id表示
-        this.idLevelOutput.string = "id: " + qData.id + "\n" + "level: " + qData.level;
 
         //フォーマットを表示
 		this.formatDisplay.node.active = true;

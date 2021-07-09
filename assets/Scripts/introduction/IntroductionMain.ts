@@ -3,7 +3,7 @@ import ExAPI from "../common/ExAPI";
 import SE from "../common/SE";
 import SystemIcon from "../common/SystemIcon";
 import FinishScreen from "../game/FinishScreen";
-import CharaUnkoSensei from "../opening/CharaUnkoSensei";
+import CharaUnkoSensei from "./CharaUnkoSensei";
 import StoryScreen from "./StoryScreen";
 import StaticData from "../StaticData";
 import UnkoGet from "../game/UnkoGet";

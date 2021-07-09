@@ -93,9 +93,7 @@
     "_spriteFrame": {
       "__uuid__": "61a1a2ce-5cd9-40f7-ba97-7ed7db672c35"
     },
-    "_texture": {
-      "__uuid__": "930f5a58-15c0-4a44-8a2b-414cb94d71b8"
-    },
+    "_texture": null,
     "_stopped": true,
     "playOnLoad": true,
     "autoRemoveOnFinish": true,

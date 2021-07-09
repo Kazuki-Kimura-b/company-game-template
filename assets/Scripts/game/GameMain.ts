@@ -1274,8 +1274,7 @@ export default class GameMain extends cc.Component {
 		this.node.runAction(cc.sequence(
 			cc.delayTime(1),
 			cc.callFunc(() => {
-				// score.showScore(this._gameScore, this._scoreDetail.base, this._scoreDetail.time, this._scoreDetail.combo, this._scoreDetail.noHint);
-				score.showScore(340, 300, 20, 10, 10);
+				score.showScore(this._gameScore, this._scoreDetail.base, this._scoreDetail.time, this._scoreDetail.combo, this._scoreDetail.noHint);
 			})
 		))
 	}

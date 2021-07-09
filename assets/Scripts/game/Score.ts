@@ -1,5 +1,5 @@
 import StaticData from "../StaticData";
-import GameMain from "../game/GameMain";
+import SE from "../common/SE";
 
 const {ccclass, property} = cc._decorator;
 
@@ -15,6 +15,7 @@ export default class ScoreBar extends cc.Component
     @property(cc.Node) noHintScoreOutput: cc.Node = null;
     @property(cc.Node) buttonNext: cc.Node = null;
     @property(cc.Node) stamp: cc.Node = null;
+    @property({ type:cc.AudioClip }) seStamp:cc.AudioClip = null;
 
     @property(cc.SpriteFrame) numbers: cc.SpriteFrame[] = [];
     @property(cc.SpriteFrame) totalNumbers: cc.SpriteFrame[] = [];
@@ -24,11 +25,11 @@ export default class ScoreBar extends cc.Component
 
     public setup(): void {
         this.gauge.setPosition(-190, -1350);
-        this.scoreBoard.setPosition(110, 1140);
+        this.scoreBoard.setPosition(110, 1258);
     }
     public showScore(total: number, base: number, speed: number, combo: number, noHint): void {
         this.gauge.runAction(cc.moveTo(0.4, -190, -220).easing(cc.easeCubicActionIn()));
-        this.scoreBoard.runAction(cc.moveTo(0.4, 110, 90).easing(cc.easeCubicActionIn()));
+        this.scoreBoard.runAction(cc.moveTo(0.4, 110, 40).easing(cc.easeCubicActionIn()));
         this.node.runAction(cc.sequence(
             cc.delayTime(1.5),
             cc.callFunc(() => {this.countup(this.baseScoreOutput, base);}),
@@ -59,9 +60,11 @@ export default class ScoreBar extends cc.Component
                         cc.delayTime(1),
                         cc.callFunc(() => {
                             this.buttonNext.active = true;
-                            this.stamp.getComponent(cc.Sprite).spriteFrame = this.stampSprites[StaticData.gameSetting.specificResultNum];
+                            this.stamp.getComponent(cc.Sprite).spriteFrame = this.stampSprites[StaticData.gameSetting.specificResultNum - 1];
+                            let colors: cc.Color[] = [new cc.Color(255, 255, 255), new cc.Color(255, 240, 0), new cc.Color(255, 0, 140)];
+                            this.stamp.color = colors[StaticData.gameSetting.specificResultNum - 1];
                             this.stamp.active = true;
-                            // 音を鳴らす
+                            SE.play(this.seStamp);
                         })
                     )
                 )

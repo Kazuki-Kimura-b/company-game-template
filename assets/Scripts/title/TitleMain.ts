@@ -31,6 +31,7 @@ export default class TitleMain extends cc.Component {
      */
     start ()
     {
+        StaticData.gameSetting.specificResultNum = 0;
         this.startButton.active = false;
         ExAPI.importGameSettings(() => {
             this.startButton.active = true;
@@ -90,6 +91,9 @@ export default class TitleMain extends cc.Component {
         
         //タップエフェクト
         TapEffect.instance().setParticeFromEvent(event);
+
+        // へこむ
+        this.startButton.children[1].runAction(cc.moveTo(.1, 5, -5));
 
         //ロード開始
         this.loadingBar.active = true;
