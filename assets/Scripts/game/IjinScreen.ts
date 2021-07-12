@@ -1,4 +1,3 @@
-import OneScaler from "../common/OneScaler";
 import { EasingName } from "../StaticData";
 
 const {ccclass, property} = cc._decorator;
@@ -158,11 +157,13 @@ export default class IjinScreen extends cc.Component {
      */
     public ijinActionBikkuri():void
     {
-        this.ijinSprite.node.y = -40;
-        cc.tween(this.ijinSprite.node)
-        .to(0.2, { position:cc.v3(0, 30, 0) }, { easing:EasingName.cubicOut })
-        .to(0.1, { position:cc.v3(0, 0, 0) }, { easing:EasingName.cubicIn })
-        .start();
+        // this.ijinSprite.node.y = -40;
+        this.ijinSprite.node.runAction(
+            cc.sequence(
+                cc.moveBy(0.2, 0, 40).easing(cc.easeCubicActionOut()),
+                cc.moveBy(0.1, 0, -40).easing(cc.easeCubicActionIn())
+            )
+        )
     }
 
 

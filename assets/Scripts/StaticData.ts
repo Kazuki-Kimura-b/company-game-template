@@ -225,7 +225,7 @@ export default class StaticData {
         endColor2: new cc.Color(0, 168 , 108),
         isRandomQuestion: false, // テスト時は、リファラで設定する
         isTestMode: true, // テストモードかどうか
-        useGameCharacter: false,
+        useGameCharacter: true,
         useCharaUnkosensei: false,
 
         /* 以下は自分で設定しない。リファラから取得する */

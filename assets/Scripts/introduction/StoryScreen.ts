@@ -20,7 +20,6 @@ export default class StoryScreen extends cc.Component
     @property(SchoolText) nameOutput:SchoolText = null;
     @property(cc.Node) nextIconNode:cc.Node = null;
     @property(cc.Sprite) effectIconSprite:cc.Sprite = null;
-    @property(cc.Button) btnSkip:cc.Button = null;
     @property(cc.SpriteFrame) bikkuriSpriteFrame:cc.SpriteFrame = null;
     @property(cc.SpriteFrame) guchaSpriteFrame:cc.SpriteFrame = null;
     @property(cc.SpriteFrame) ikariSpriteFrame:cc.SpriteFrame = null;
@@ -71,7 +70,6 @@ export default class StoryScreen extends cc.Component
         this.messageWindow.active = false;
         this.nextIconNode.active = false;
         this.effectIconSprite.node.active = false;
-        this.btnSkip.node.active = StaticData.DEVELOP_MODE;     //デベロップモードだけスキップボタンを表示
 
         this._talkCharacter = -1;       //未設定
 
@@ -603,7 +601,6 @@ export default class StoryScreen extends cc.Component
         {
             this.messageOutput.setText("");
             this.nameOutput.node.parent.active = false;
-            this.btnSkip.node.active = false;
 
             //偉人が表示されてない場合があるので表示する
             this._ijinScreen.show();
