@@ -154,7 +154,7 @@ export default class QuestionWindow extends cc.Component
 		});
         
         //問題の上に何問目か小さく表示
-        this.questionNumOutput.string = "第" + (qNum + 1) + "問:" + qData.subject;
+        this.questionNumOutput.string = "第" + (qNum + 1) + "問";
 
         //フォーマットを表示
 		this.formatDisplay.node.active = true;

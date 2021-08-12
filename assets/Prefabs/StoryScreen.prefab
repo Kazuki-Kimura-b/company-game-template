@@ -320,7 +320,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "302dd711-b55a-457d-8e2e-1462a574ee35"
+      "__uuid__": "778c4e08-b3b6-4be5-97c5-19549e67700c"
     },
     "_type": 0,
     "_sizeMode": 1,
@@ -334,7 +334,7 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_atlas": {
-      "__uuid__": "e24d87e7-6662-45c1-9280-9f07c593c448"
+      "__uuid__": "b148988b-7d73-4834-b86b-9ee2c8215428"
     },
     "_id": ""
   },
@@ -502,7 +502,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "1419a5ef-b99f-4f98-9bcc-5822f6352fec"
+      "__uuid__": "17e4e86c-bc46-4fd4-aa54-8a63c01a9133"
     },
     "_type": 0,
     "_sizeMode": 1,
@@ -516,7 +516,7 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_atlas": {
-      "__uuid__": "e24d87e7-6662-45c1-9280-9f07c593c448"
+      "__uuid__": "b148988b-7d73-4834-b86b-9ee2c8215428"
     },
     "_id": ""
   },
@@ -707,7 +707,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "d6022cc8-2d88-494f-8500-a4a0adb99bd1"
+      "__uuid__": "a6faa660-3bd7-4a35-843e-37d37b7939c9"
     },
     "_type": 0,
     "_sizeMode": 0,
@@ -721,7 +721,7 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_atlas": {
-      "__uuid__": "e24d87e7-6662-45c1-9280-9f07c593c448"
+      "__uuid__": "b148988b-7d73-4834-b86b-9ee2c8215428"
     },
     "_id": ""
   },
@@ -1007,7 +1007,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "f5fc7b01-3650-433d-ab2c-946e3e6d0a4f"
+      "__uuid__": "5e7c6ea9-0626-4ed3-b533-9ecdf3c4f497"
     },
     "_type": 0,
     "_sizeMode": 1,
@@ -1021,7 +1021,7 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_atlas": {
-      "__uuid__": "e24d87e7-6662-45c1-9280-9f07c593c448"
+      "__uuid__": "b148988b-7d73-4834-b86b-9ee2c8215428"
     },
     "_id": ""
   },
@@ -1077,13 +1077,13 @@
       "__id__": 7
     },
     "bikkuriSpriteFrame": {
-      "__uuid__": "302dd711-b55a-457d-8e2e-1462a574ee35"
+      "__uuid__": "778c4e08-b3b6-4be5-97c5-19549e67700c"
     },
     "guchaSpriteFrame": {
-      "__uuid__": "d560b43c-34ee-43f3-869b-6508da37f1ff"
+      "__uuid__": "b8bfcc47-8616-410f-b3c8-20c809cdb147"
     },
     "ikariSpriteFrame": {
-      "__uuid__": "55cbe92f-eeb5-4561-8927-6933a9c74d15"
+      "__uuid__": "74ad4f2e-59a7-4610-b6ec-faebbc2b3c24"
     },
     "talkPlayerSE": {
       "__uuid__": "50700fff-4e11-4728-9eba-3195e4abe0ba"

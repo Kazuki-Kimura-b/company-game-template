@@ -3,8 +3,8 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 export default class SE
 {
-    private static _SE_Enabled:boolean = false;
-    private static _BGM_Enabled:boolean = false;
+    private static _SE_Enabled:boolean = true;
+    private static _BGM_Enabled:boolean = true;
     
     public static get SE_Enabled():boolean { return this._SE_Enabled; }
     public static set SE_Enabled(value:boolean) { this._SE_Enabled = value; }

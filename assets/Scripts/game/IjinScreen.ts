@@ -140,15 +140,17 @@ export default class IjinScreen extends cc.Component {
      */
     public ijinActionBuruburu():void
     {
-        this._ijinTween = cc.tween(this.ijinSprite.node)
-        .repeatForever(
-            cc.tween()
-            .to(0.0, { position: cc.v2(3, 0) })
-            .delay(0.05)
-            .to(0.0, { position: cc.v2(-3, 0) })
-            .delay(0.05)
+        // this._ijinTween = cc.tween(this.ijinSprite.node)
+        this.ijinSprite.node.runAction(
+            cc.repeat(
+                cc.sequence(
+                    cc.moveBy(0.0, 3, 0),
+                    cc.delayTime(0.05),
+                    cc.moveBy(0.0, -3, 0),
+                    cc.delayTime(0.05)
+                ), 10
+            )
         )
-        .start();
     }
 
 

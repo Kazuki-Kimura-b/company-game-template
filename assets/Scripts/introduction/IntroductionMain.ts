@@ -9,6 +9,8 @@ import StaticData from "../StaticData";
 import UnkoGet from "../game/UnkoGet";
 import IjinScreen from "../game/IjinScreen";
 import IntroductionBG from "../game/bg/GameBG_introduction";
+import GameIcon from "./GameIcon";
+import Stamp from "./Stamp";
 
 const {ccclass, property} = cc._decorator;
 
@@ -39,6 +41,11 @@ export default class IntroductionMain extends cc.Component
     @property(cc.Node) menuBoard: cc.Node = null;
     @property(cc.Node) endButtons: cc.Node[] = [];
     @property(cc.Node) btnSkip: cc.Node = null;
+    @property(cc.Node) lastBoard: cc.Node = null;
+    @property(cc.Node) gameArea: cc.Node = null;
+    @property(cc.Node) stampArea: cc.Node = null;
+    @property(cc.Prefab) gameIcon: cc.Node = null;
+    @property(cc.Prefab) stamp: cc.Prefab = null;
 
 
     private _sensei: IjinScreen = null;
@@ -48,6 +55,7 @@ export default class IntroductionMain extends cc.Component
 
     start ()
     {
+
         // 背景を読み込み
         this._background = cc.instantiate(this.bgPrefab);
         this.bgParentNode.addChild(this._background);
@@ -61,7 +69,7 @@ export default class IntroductionMain extends cc.Component
         } else {
             this._sensei = this._background.getChildByName("IjinScreen").getComponent(IjinScreen);
         }
-        
+
         this._sensei.setup();
         this._sensei.hide();
 
@@ -85,12 +93,15 @@ export default class IntroductionMain extends cc.Component
         this._negaEffector.canvasNode = this.canvas.node;
 
         let _introductionBG = this.bgParentNode.children[0].getComponent(IntroductionBG);
+
         // エフェクトを追加
         this.storyScreen.onStoryCommonCallback((code:string, subCode:string)=>
         {
-            if(code == "changeFace")
-            {
+            if (code == "changeFace") {
                 _introductionBG.changeSenseiFace(Number(subCode));
+            }
+            if (code == "hakushu") {
+                _introductionBG.hakushu();
             }
         });
 
@@ -181,7 +192,42 @@ export default class IntroductionMain extends cc.Component
                 this.storyScreen.setupStory(StaticData.opponentData.name, script);
                 this.storyScreen.onComplete(()=>
                 {
+                    this.btnSkip.active = false;
                     if (StaticData.gameSetting.specificResultNum > 0) {
+                        // 他のゲーム一覧を取得
+                        ExAPI.exGetTopContents((res) => {
+                            this.gameArea.setContentSize(750, 68 + (240 * Math.floor(res.length / 4)));
+                            res.forEach((v, index) => {
+                                ExAPI.loadImage(v.theme, v.image_url, (result) => {
+                                    let node: cc.Node = cc.instantiate(this.gameIcon);
+                                    let controller: GameIcon = node.getComponent(GameIcon);
+                                    controller.image.spriteFrame = result.image;
+                                    controller.setBtnURL(v.link);
+                                    node.setPosition(-218 + (218 * (index % 3)), -154 - (240 * Math.floor(index / 3)));
+                                    this.gameArea.addChild(node);
+                                });
+                            });
+                        });
+                        ExAPI.exGetStamp((res) => {
+                            cc.log(res);
+                            this.stampArea.setContentSize(750, 68 + (240 * Math.floor(res.length / 4)));
+                            let index: number = 0;
+                            for (let item in res) {
+                                ExAPI.loadImage("key", res[item].stamp_icon_url, (result) => {
+                                    cc.log(res[item]);
+                                    let node: cc.Node = cc.instantiate(this.stamp);
+                                    let controller: Stamp = node.getComponent(Stamp);
+                                    controller.setName(res[item].name);
+                                    if (res[item].stamp) {
+                                        controller.unko.spriteFrame = result.image;
+                                    }
+                                    node.setPosition(-218 + (218 * (index % 3)), -154 - (240 * Math.floor(index / 3)));
+                                    this.stampArea.addChild(node);
+                                    index++;
+                                });
+                            }
+                        });
+
                         if (StaticData.gameSetting.specificResultNum === 3) {
                             this._endUnkoGet(() => {
                                 this._openMenu();
@@ -213,14 +259,14 @@ export default class IntroductionMain extends cc.Component
     }
 
     private _openMenu(): void {
-        this.menuBoard.runAction(cc.moveTo(0.2, 0, -36));
+        this.menuBoard.runAction(cc.moveTo(0.2, 0, 100));
     }
 
     /**
-     * 会話を終了し、ゲーム画面へ
-     */
-     private _endIntroduction():void
-     {
+    * 会話を終了し、ゲーム画面へ
+    */
+    private _endIntroduction():void
+    {
          SE.bgmStop();
          this._finishScreen.setupAtGameMode("start");
          this.btnSkip.active = false;
@@ -230,13 +276,13 @@ export default class IntroductionMain extends cc.Component
              SystemIcon.create(this.sceneLoadIndicator);     //読み込み中アイコン
              cc.director.loadScene("game");
          });
-     }
+    }
 
-     private _hideButtons(num): void {
+    private _hideButtons(num): void {
          this.endButtons[num].runAction(cc.scaleTo(0.2, 0).easing(cc.easeCubicActionIn()));
-     }
+    }
 
-     private onPressTitleButton(): void {
+    private onPressTitleButton(): void {
          this.node.runAction(
              cc.sequence(
                  cc.callFunc(() => {
@@ -248,26 +294,33 @@ export default class IntroductionMain extends cc.Component
                  cc.callFunc(() => {cc.director.loadScene("title");})
              )
          )
-     }
+    }
 
-     private onPressOtherButton(): void {
-        this.node.runAction(
-            cc.sequence(
-                cc.callFunc(() => {
-                    this._hideButtons(0);
-                    this._hideButtons(1);
-                    this._hideButtons(2);
-                }),
-                cc.delayTime(1),
-                cc.callFunc(() => {
-                    this.menuBoard.runAction(cc.moveTo(0.4, 0, 832).easing(cc.easeCubicActionIn()));
+    private onPressTabButton(event, code: string): void {
+        if (code === "game") {
+            // ゲームタブを開く
+            this.lastBoard.getChildByName("tabBar").color = new cc.Color(255, 239, 0);
+            this.lastBoard.getChildByName("game").active = true;
+            this.lastBoard.getChildByName("stamp").active = false;
+            this.lastBoard.active = true;
+        }
+        else {
+            // スタンプタブを開く
+            this.stampArea.children.forEach((v) => {
+                v.getChildByName("fukidashi").active = false;
+            });
+            this.lastBoard.getChildByName("tabBar").color = new cc.Color(60, 250, 200);
+            this.lastBoard.getChildByName("game").active = false;
+            this.lastBoard.getChildByName("stamp").active = true;
+            this.lastBoard.active = true;
+        }
+    }
 
-                })
-            )
-        )
-     }
+    private onPressCancellastBoard(): void {
+        this.lastBoard.active = false;
+    }
 
-     private onPressEndButton(): void {
+    private onPressEndButton(): void {
         this.node.runAction(
             cc.sequence(
                 cc.callFunc(() => {
@@ -279,7 +332,7 @@ export default class IntroductionMain extends cc.Component
                 cc.callFunc(() => {window.location.href = "https://unkogakuen.com"})
             )
         )
-     }
+    }
 
     // update (dt) {}
 }

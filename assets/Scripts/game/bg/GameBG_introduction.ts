@@ -35,5 +35,25 @@ export default class IntroductionBG extends GameBG {
     public changeFood(num: number): void {
         this.foodSprite.spriteFrame = this.foodSpriteFrames[num];
     }
+
+    public hakushu(): void {
+        cc.tween(this.node)
+        .repeat(6, cc.tween(this.node)
+        .call(() => {this.changeSenseiFace(3)})
+        .delay(.1)
+        .call(() => {this.changeSenseiFace(6)})
+        .delay(.1)
+        ).start();
+        // .call(() => {this.changeSenseiFace(3)})
+        // .delay(.1)
+        // .call(() => {this.changeSenseiFace(4)})
+        // .delay(.1)
+        // .call(() => {this.changeSenseiFace(3)})
+        // .delay(.1)
+        // .call(() => {this.changeSenseiFace(4)})
+        // .delay(.1)
+        // .call(() => {this.changeSenseiFace(3)})
+        
+    }
 }
 

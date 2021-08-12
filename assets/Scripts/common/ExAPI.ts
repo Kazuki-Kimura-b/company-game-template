@@ -323,7 +323,7 @@ export default class SchoolAPI extends APIAccess
     
             xhr.open( 'POST', url, true );
             // POST 送信の場合は Content-Type は固定.
-            xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+            xhr.setRequestHeader( 'Content-Type', 'application/json' );
             xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
             xhr.timeout = SchoolAPI.TIME_OUT;
     
@@ -390,7 +390,7 @@ export default class SchoolAPI extends APIAccess
      * @param gameMode 各企業の名前を指定する
      * @param reference どこからのアクセスかを入れる
      */
-     public static exEnd(requestToken: string, callback:(response:any)=>void):void
+     public static exEnd(requestToken: string, score: number, callback:(response:any)=>void):void
      {
         if (!StaticData.gameSetting.isTestMode) {
             this._aliveTokenCheck();        //トークンがあるか確認
@@ -401,7 +401,7 @@ export default class SchoolAPI extends APIAccess
     
             xhr.open( 'POST', url, true );
             // POST 送信の場合は Content-Type は固定.
-            xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+            xhr.setRequestHeader( 'Content-Type', 'application/json' );
             xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
             xhr.timeout = SchoolAPI.TIME_OUT;
     
@@ -447,10 +447,16 @@ export default class SchoolAPI extends APIAccess
                 //再接続
                 this._errorPopup(APIErrorType.OFFLINE, ()=>
                 {
-                    this.exEnd(requestToken, callback);
+                    this.exEnd(requestToken, score, callback);
                 });
-                //console.error(xhr.statusText);
             };
+            
+            let json =
+            {
+                token: requestToken,
+                scoring_total: score
+            }
+            xhr.send(JSON.stringify(json));
             xhr.send(`token=${requestToken}`);
         } else {
             callback("exEnd: test mode")
@@ -494,4 +500,75 @@ export default class SchoolAPI extends APIAccess
             callback();
         })
     }
+
+    /**
+    * スタンプ取得用API
+    * @param callback
+    */
+    public static exGetStamp(callback:(response:any)=>void):void
+    {
+        let xhr:XMLHttpRequest = new XMLHttpRequest();
+        let url:string = this.staticGetHost() + "/api/v1/tie_up/stamps";
+        xhr.open("GET", url, true);
+        xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
+        xhr.timeout = SchoolAPI.TIME_OUT;
+
+        xhr.onload = (ev:ProgressEvent<EventTarget>)=>
+        {
+            let response:any = null;
+
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200)
+            {
+                let responseText:string = xhr.responseText;
+                let json:any = JSON.parse(responseText);
+
+                if (json == null)
+                {
+                    cc.log("GET STAMPS ERROR");
+                }
+                else
+                {
+                    response = json;
+                    callback(response);
+                }
+            }
+        };
+        xhr.send();
+     }
+
+     /**
+    * トップページコンテンツ取得用API
+    * @param callback
+    */
+    public static exGetTopContents(callback:(response:any)=>void):void
+    {
+        let xhr:XMLHttpRequest = new XMLHttpRequest();
+        let url:string = this.staticGetUnkoGakuenHost() + "/api/v2/tie_up/top_page_contents";
+        
+        xhr.open("GET", url + "?categories[]=anzen&categories[]=seikatsu", true);
+        xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
+        xhr.timeout = SchoolAPI.TIME_OUT;
+
+        xhr.onload = (ev:ProgressEvent<EventTarget>)=>
+        {
+            let response:any = null;
+
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200)
+            {
+                let responseText:string = xhr.responseText;
+                let json:any = JSON.parse(responseText);
+
+                if (json == null)
+                {
+                    cc.log("GET STAMPS ERROR");
+                }
+                else
+                {
+                    response = json;
+                    callback(response);
+                }
+            }
+        };
+        xhr.send();
+     }
 }

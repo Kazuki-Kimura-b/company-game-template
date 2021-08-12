@@ -4397,9 +4397,7 @@
     "kaisetsuBtnNattoku": {
       "__uuid__": "ef93e947-30d1-47ae-bef5-b6258e530772"
     },
-    "vsBGM": {
-      "__uuid__": "84c1d0db-99db-4ed6-86ff-752d2984df07"
-    },
+    "vsBGM": null,
     "_id": "33KvCGyPFOI50Vti/2Dk48"
   },
   {

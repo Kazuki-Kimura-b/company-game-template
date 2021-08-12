@@ -1175,10 +1175,10 @@ export default class GameMain extends cc.Component {
 
 	private _sendEndGameAPI():void
 	{
-		ExAPI.exEnd(this._requestToken, ()=>
+		ExAPI.exEnd(this._requestToken, this._gameScore, ()=>
 		{
 			cc.log("GAME END RESPONSE");
-			if (this._gameScore >= 350) {
+			if (this._gameScore >= 300) {
 				StaticData.gameSetting.specificResultNum = 3;
 			} else if (this._gameScore >= 250) {
 				StaticData.gameSetting.specificResultNum = 2;

@@ -1090,13 +1090,31 @@
     },
     "unkoSenseiSpriteFrames": [
       {
-        "__uuid__": "5faa80ea-f419-4fa7-9917-1a848d38fd3d"
+        "__uuid__": "12fc966b-29f0-4d39-9f69-36611cdfa917"
       },
       {
-        "__uuid__": "8693389b-9ab2-4d8d-9fd1-b7aadc34106b"
+        "__uuid__": "29fad09f-48e9-4408-a18c-4c5a818e203e"
       },
       {
-        "__uuid__": "b4f8cecd-182c-446f-8062-0163442a8f80"
+        "__uuid__": "84eafa43-d8f2-406f-a607-07251d82afca"
+      },
+      {
+        "__uuid__": "35e226ec-71de-468f-9792-03987fcd1f37"
+      },
+      {
+        "__uuid__": "e8d4c001-fc86-4e7b-9fcc-2a00b6595cd2"
+      },
+      {
+        "__uuid__": "4ced4112-37c2-41ee-aa14-b81975d96f54"
+      },
+      {
+        "__uuid__": "c259b241-1078-4075-9901-4013ac3f09bd"
+      },
+      {
+        "__uuid__": "4dd4bbef-4c64-41f8-a242-06e627bf8681"
+      },
+      {
+        "__uuid__": "6053e1e4-a6b3-4245-9bcc-642c686574d9"
       }
     ],
     "foodSprite": {

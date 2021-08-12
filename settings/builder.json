@@ -67,7 +67,7 @@
     "height": 720
   },
   "appBundle": false,
-  "mainCompressionType": "default",
+  "mainCompressionType": "merge_all_json",
   "mainIsRemote": false,
   "nativeMd5Cache": true,
   "agreements": {}

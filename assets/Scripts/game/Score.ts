@@ -44,7 +44,7 @@ export default class ScoreBar extends cc.Component
         ));
     }
     public showGauge(score: number): void {
-        let dispNum: number = Math.ceil(score / 350 * 15); // 何個ゲージを表示するか
+        let dispNum: number = Math.ceil(score / 400 * 15); // 何個ゲージを表示するか
         let count: number = 0;
         let activateMark = () => {
             if (dispNum !== 0) {
