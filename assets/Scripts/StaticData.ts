@@ -86,7 +86,10 @@ interface GameSetting {
     startColor2: cc.Color,
     endColor1: cc.Color,
     endColor2: cc.Color,
+    btnColor1: cc.Color,
+    btnColor2: cc.Color,
     isTestMode: boolean, // 確認モードかどうか。確認モードの場合、クエリで設定をつけていく
+    isStampMode: boolean, //
     isRandomQuestion: boolean, // ランダムで出題するかどうか
     specificQuestionNum: number, // 特定の問題のID
     specificResultNum: number, // 特定の結果画面のID
@@ -223,8 +226,11 @@ export default class StaticData {
         startColor2: new cc.Color(255, 0, 0), // 企業ごとのfinishScreenの色2
         endColor1: new cc.Color(0, 40, 190),
         endColor2: new cc.Color(0, 168 , 108),
+        btnColor1: new cc.Color(255, 0 , 0), // タイトルにもどる
+        btnColor2: new cc.Color(0, 40 , 255), // それ以外
         isRandomQuestion: false, // テスト時は、リファラで設定する
-        isTestMode: false, // テストモードかどうか
+        isTestMode: true, // テストモードかどうか
+        isStampMode: false, // スタンプを取得できるかどうか
         useGameCharacter: true,
         useCharaUnkosensei: false,
 

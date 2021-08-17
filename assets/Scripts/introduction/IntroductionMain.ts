@@ -46,6 +46,7 @@ export default class IntroductionMain extends cc.Component
     @property(cc.Node) stampArea: cc.Node = null;
     @property(cc.Prefab) gameIcon: cc.Node = null;
     @property(cc.Prefab) stamp: cc.Prefab = null;
+    @property(cc.Node) lockModal: cc.Node = null;
 
 
     private _sensei: IjinScreen = null;
@@ -208,25 +209,29 @@ export default class IntroductionMain extends cc.Component
                                 });
                             });
                         });
-                        ExAPI.exGetStamp((res) => {
-                            cc.log(res);
-                            this.stampArea.setContentSize(750, 68 + (240 * Math.floor(res.length / 4)));
-                            let index: number = 0;
-                            for (let item in res) {
-                                ExAPI.loadImage("key", res[item].stamp_icon_url, (result) => {
-                                    cc.log(res[item]);
-                                    let node: cc.Node = cc.instantiate(this.stamp);
-                                    let controller: Stamp = node.getComponent(Stamp);
-                                    controller.setName(res[item].name);
-                                    if (res[item].stamp) {
-                                        controller.unko.spriteFrame = result.image;
-                                    }
-                                    node.setPosition(-218 + (218 * (index % 3)), -154 - (240 * Math.floor(index / 3)));
-                                    this.stampArea.addChild(node);
-                                    index++;
-                                });
-                            }
-                        });
+
+                        // スタンプ一覧を取得
+                        if (StaticData.gameSetting.isStampMode) {
+                            ExAPI.exGetStamp((res) => {
+                                cc.log(res);
+                                this.stampArea.setContentSize(750, 68 + (240 * Math.floor(res.length / 4)));
+                                let index: number = 0;
+                                for (let item in res) {
+                                    ExAPI.loadImage("key", res[item].stamp_icon_url, (result) => {
+                                        cc.log(res[item]);
+                                        let node: cc.Node = cc.instantiate(this.stamp);
+                                        let controller: Stamp = node.getComponent(Stamp);
+                                        controller.setName(res[item].name);
+                                        if (ExAPI.haveEnabledToken() && res[item].stamp) {
+                                            controller.unko.spriteFrame = result.image;
+                                        }
+                                        node.setPosition(-218 + (218 * (index % 3)), -154 - (240 * Math.floor(index / 3)));
+                                        this.stampArea.addChild(node);
+                                        index++;
+                                    });
+                                }
+                            });
+                        }
 
                         if (StaticData.gameSetting.specificResultNum === 3) {
                             this._endUnkoGet(() => {
@@ -259,7 +264,19 @@ export default class IntroductionMain extends cc.Component
     }
 
     private _openMenu(): void {
-        this.menuBoard.runAction(cc.moveTo(0.2, 0, 100));
+        // ボタンのカラーを設定
+        this.menuBoard.getChildByName("introduction_button_1").getChildByName("base").color = StaticData.gameSetting.btnColor1;
+        this.menuBoard.getChildByName("introduction_button_2").getChildByName("base").color = StaticData.gameSetting.btnColor2;
+        this.menuBoard.getChildByName("introduction_button_3").getChildByName("base").color = StaticData.gameSetting.btnColor2;
+        this.menuBoard.getChildByName("introduction_button_4").getChildByName("base").color = StaticData.gameSetting.btnColor2;
+        if (!StaticData.gameSetting.isStampMode) {
+            // this.menuBoard.getChildByName("introduction_button_2").active = false;
+            this.menuBoard.getChildByName("introduction_button_3").active = false;
+            this.menuBoard.getChildByName("introduction_button_4").setPosition(0, -400);
+            this.menuBoard.runAction(cc.moveTo(0.2, 0, -60));
+        } else {
+            this.menuBoard.runAction(cc.moveTo(0.2, 0, 100));
+        }
     }
 
     /**
@@ -306,6 +323,11 @@ export default class IntroductionMain extends cc.Component
         }
         else {
             // スタンプタブを開く
+            if (!ExAPI.haveEnabledToken()) {
+                this.lockModal.opacity = 0;
+                this.lockModal.active = true;
+                this.lockModal.runAction(cc.fadeIn(0.2));
+            }
             this.stampArea.children.forEach((v) => {
                 v.getChildByName("fukidashi").active = false;
             });
@@ -317,6 +339,7 @@ export default class IntroductionMain extends cc.Component
     }
 
     private onPressCancellastBoard(): void {
+        this.lockModal.active = false;
         this.lastBoard.active = false;
     }
 
@@ -334,5 +357,17 @@ export default class IntroductionMain extends cc.Component
         )
     }
 
-    // update (dt) {}
+    private onPressNyugakuButton(): void {
+        window.location.href = "https://unkogakuen.com/users/sign_up";
+    }
+
+    private onPressNYugakuCancel(): void {
+        this.lockModal.runAction(
+            cc.sequence(
+                cc.fadeOut(0.2),
+                cc.callFunc(() => {this.lockModal.active = false;})
+            )
+        )
+    }
+
 }

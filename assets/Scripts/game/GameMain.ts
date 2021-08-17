@@ -1175,7 +1175,10 @@ export default class GameMain extends cc.Component {
 
 	private _sendEndGameAPI():void
 	{
-		ExAPI.exEnd(this._requestToken, this._gameScore, ()=>
+		// スタンプ取得しない場合は、0点で保存する
+		let score: number = 0;
+		if (StaticData.gameSetting.isStampMode) score = this._gameScore;
+		ExAPI.exEnd(this._requestToken, score, ()=>
 		{
 			cc.log("GAME END RESPONSE");
 			if (this._gameScore >= 300) {

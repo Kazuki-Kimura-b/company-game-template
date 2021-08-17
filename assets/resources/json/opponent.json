@@ -1,13 +1,11 @@
 {
   "name": "うんこ{先生,せんせい}",
-  "win_script": "偉人が勝ったときのセリフ",
-  "lose_script": "偉人が負けたときのセリフ",
   "unko_get_script": "農業のうんこだ",
   "play_script": "最後の問題じゃ！",
-  "correct_script1": "正解時の偉人のセリフ1",
-  "correct_script2": "正解時の偉人のセリフ2",
-  "correct_script3": "正解時の偉人のセリフ3",
-  "incorrect_script1": "不正解時の偉人のセリフ1",
-  "incorrect_script2": "不正解時の偉人のセリフ2",
-  "incorrect_script3": "不正解時の偉人のセリフ3"
+  "correct_script1": "なかなかやるのう！その{調子,ちょうし}じゃ！",
+  "correct_script2": "すばらしい！よくできておるぞい！",
+  "correct_script3": "",
+  "incorrect_script1": "おちついて、よ〜く{考,かんが}えるのじゃ！",
+  "incorrect_script2": "あきらめちゃいかんぞい！",
+  "incorrect_script3": ""
 }
