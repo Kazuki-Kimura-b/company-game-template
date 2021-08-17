@@ -231,6 +231,9 @@ export default class IntroductionMain extends cc.Component
                                     });
                                 }
                             });
+                        } else {
+                            // スタンプタブを非表示
+                            this.lastBoard.getChildByName("tab_stamp").active = false;
                         }
 
                         if (StaticData.gameSetting.specificResultNum === 3) {
@@ -270,7 +273,6 @@ export default class IntroductionMain extends cc.Component
         this.menuBoard.getChildByName("introduction_button_3").getChildByName("base").color = StaticData.gameSetting.btnColor2;
         this.menuBoard.getChildByName("introduction_button_4").getChildByName("base").color = StaticData.gameSetting.btnColor2;
         if (!StaticData.gameSetting.isStampMode) {
-            // this.menuBoard.getChildByName("introduction_button_2").active = false;
             this.menuBoard.getChildByName("introduction_button_3").active = false;
             this.menuBoard.getChildByName("introduction_button_4").setPosition(0, -400);
             this.menuBoard.runAction(cc.moveTo(0.2, 0, -60));
