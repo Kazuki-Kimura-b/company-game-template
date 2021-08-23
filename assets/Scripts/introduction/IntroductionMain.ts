@@ -30,7 +30,6 @@ export default class IntroductionMain extends cc.Component
     @property(StoryScreen) storyScreen:StoryScreen = null;
     @property(cc.Node) loadingBarNode:cc.Node = null;
     @property(cc.Node) finishScreenParentNode:cc.Node = null;
-    @property({ type:cc.AudioClip }) bgmAudioClip:cc.AudioClip = null;
     @property({ type:cc.AudioClip }) seShock:cc.AudioClip = null;
     @property(cc.Prefab) finishScreenPrefab:cc.Prefab = null;
     @property(cc.Prefab) sceneLoadIndicator: cc.Prefab = null;
@@ -48,6 +47,9 @@ export default class IntroductionMain extends cc.Component
     @property(cc.Prefab) stamp: cc.Prefab = null;
     @property(cc.Node) lockModal: cc.Node = null;
 
+    @property({ type:cc.AudioClip }) bgmBefore:cc.AudioClip = null;
+    @property({ type:cc.AudioClip }) bgmAfter:cc.AudioClip = null;
+
 
     private _sensei: IjinScreen = null;
     private _negaEffector: NegaEffector = null;
@@ -56,6 +58,51 @@ export default class IntroductionMain extends cc.Component
 
     start ()
     {
+        if (StaticData.gameSetting.specificResultNum > 0) {
+            let gameKeys: string[] = [];
+            // 他のゲーム一覧を取得
+            ExAPI.exGetTopContents((res) => {
+                this.gameArea.setContentSize(750, 68 + (240 * Math.floor(res.length / 4)));
+                res.forEach((v, index) => {
+                    gameKeys.push(v.key);
+                    ExAPI.loadImage(v.theme, v.image_url, (result) => {
+                        let node: cc.Node = cc.instantiate(this.gameIcon);
+                        let controller: GameIcon = node.getComponent(GameIcon);
+                        controller.image.spriteFrame = result.image;
+                        controller.setBtnURL(v.link);
+                        node.setPosition(-218 + (218 * (index % 3)), -154 - (240 * Math.floor(index / 3)));
+                        this.gameArea.addChild(node);
+                    });
+                });
+                cc.log(gameKeys);
+                // スタンプ一覧を取得
+                if (StaticData.gameSetting.isStampMode) {
+                    ExAPI.exGetStamp((res) => {
+                        this.stampArea.setContentSize(750, 68 + (240 * Math.floor(res.length / 4)));
+                        let index: number = 0;
+                        for (let key of gameKeys) {
+                            ExAPI.loadImage("key", res[key].stamp_icon_url, (result) => {
+                                let node: cc.Node = cc.instantiate(this.stamp);
+                                let controller: Stamp = node.getComponent(Stamp);
+                                controller.setName(res[key].name);
+                                // ゲストでない場合、取得していたら表示する
+                                if (ExAPI.staticGetToken() !== "develop_token" && res[key].stamp) {
+                                    controller.unko.spriteFrame = result.image;
+                                }
+                                node.setPosition(-218 + (218 * (index % 3)), -154 - (240 * Math.floor(index / 3)));
+                                this.stampArea.addChild(node);
+                                index++;
+                            })
+                            // res[key]
+                        }
+                    });
+                } else {
+                    // スタンプタブを非表示
+                    this.lastBoard.getChildByName("tab_stamp").active = false;
+                }
+            });
+
+        }
 
         // 背景を読み込み
         this._background = cc.instantiate(this.bgPrefab);
@@ -126,12 +173,16 @@ export default class IntroductionMain extends cc.Component
                 // フィニッシュスクリーン（開始用）がはける
                 this._finishScreen.endFinishAction(()=>
                 {
+                    if (StaticData.gameSetting.specificResultNum > 0) SE.bgmStart(this.bgmBefore);
+                    else SE.bgmStart(this.bgmAfter);
                     this._showStory();
                 });
             });
         } else {
             this._finishScreen.endFinishAction(()=>
                 {
+                    if (StaticData.gameSetting.specificResultNum > 0) SE.bgmStart(this.bgmBefore);
+                    else SE.bgmStart(this.bgmAfter);
                     this._showStory();
                 });
         }
@@ -194,48 +245,8 @@ export default class IntroductionMain extends cc.Component
                 this.storyScreen.onComplete(()=>
                 {
                     this.btnSkip.active = false;
+
                     if (StaticData.gameSetting.specificResultNum > 0) {
-                        // 他のゲーム一覧を取得
-                        ExAPI.exGetTopContents((res) => {
-                            this.gameArea.setContentSize(750, 68 + (240 * Math.floor(res.length / 4)));
-                            res.forEach((v, index) => {
-                                ExAPI.loadImage(v.theme, v.image_url, (result) => {
-                                    let node: cc.Node = cc.instantiate(this.gameIcon);
-                                    let controller: GameIcon = node.getComponent(GameIcon);
-                                    controller.image.spriteFrame = result.image;
-                                    controller.setBtnURL(v.link);
-                                    node.setPosition(-218 + (218 * (index % 3)), -154 - (240 * Math.floor(index / 3)));
-                                    this.gameArea.addChild(node);
-                                });
-                            });
-                        });
-
-                        // スタンプ一覧を取得
-                        if (StaticData.gameSetting.isStampMode) {
-                            ExAPI.exGetStamp((res) => {
-                                cc.log(res);
-                                this.stampArea.setContentSize(750, 68 + (240 * Math.floor(res.length / 4)));
-                                let index: number = 0;
-                                for (let item in res) {
-                                    ExAPI.loadImage("key", res[item].stamp_icon_url, (result) => {
-                                        cc.log(res[item]);
-                                        let node: cc.Node = cc.instantiate(this.stamp);
-                                        let controller: Stamp = node.getComponent(Stamp);
-                                        controller.setName(res[item].name);
-                                        if (ExAPI.haveEnabledToken() && res[item].stamp) {
-                                            controller.unko.spriteFrame = result.image;
-                                        }
-                                        node.setPosition(-218 + (218 * (index % 3)), -154 - (240 * Math.floor(index / 3)));
-                                        this.stampArea.addChild(node);
-                                        index++;
-                                    });
-                                }
-                            });
-                        } else {
-                            // スタンプタブを非表示
-                            this.lastBoard.getChildByName("tab_stamp").active = false;
-                        }
-
                         if (StaticData.gameSetting.specificResultNum === 3) {
                             this._endUnkoGet(() => {
                                 this._openMenu();
@@ -267,11 +278,6 @@ export default class IntroductionMain extends cc.Component
     }
 
     private _openMenu(): void {
-        // ボタンのカラーを設定
-        this.menuBoard.getChildByName("introduction_button_1").getChildByName("base").color = StaticData.gameSetting.btnColor1;
-        this.menuBoard.getChildByName("introduction_button_2").getChildByName("base").color = StaticData.gameSetting.btnColor2;
-        this.menuBoard.getChildByName("introduction_button_3").getChildByName("base").color = StaticData.gameSetting.btnColor2;
-        this.menuBoard.getChildByName("introduction_button_4").getChildByName("base").color = StaticData.gameSetting.btnColor2;
         if (!StaticData.gameSetting.isStampMode) {
             this.menuBoard.getChildByName("introduction_button_3").active = false;
             this.menuBoard.getChildByName("introduction_button_4").setPosition(0, -400);
@@ -305,12 +311,15 @@ export default class IntroductionMain extends cc.Component
          this.node.runAction(
              cc.sequence(
                  cc.callFunc(() => {
-                    this._hideButtons(0);
                     this._hideButtons(1);
                     this._hideButtons(2);
+                    this._hideButtons(3);
                  }),
                  cc.delayTime(0.4),
-                 cc.callFunc(() => {cc.director.loadScene("title");})
+                 cc.callFunc(() => {
+                    cc.director.loadScene("title");
+                    SE.bgmStop();
+                })
              )
          )
     }
@@ -325,7 +334,8 @@ export default class IntroductionMain extends cc.Component
         }
         else {
             // スタンプタブを開く
-            if (!ExAPI.haveEnabledToken()) {
+            if (ExAPI.staticGetToken() === "develop_token") {
+                // ゲストの場合、ロック画面を表示する
                 this.lockModal.opacity = 0;
                 this.lockModal.active = true;
                 this.lockModal.runAction(cc.fadeIn(0.2));

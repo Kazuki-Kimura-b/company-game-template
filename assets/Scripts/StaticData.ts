@@ -81,19 +81,17 @@ interface OpponentData {
 
 
 interface GameSetting {
-    companyName: string, // 企業名
-    startColor1: cc.Color, // finishScreenで使用するカラー
-    startColor2: cc.Color,
-    endColor1: cc.Color,
-    endColor2: cc.Color,
-    btnColor1: cc.Color,
-    btnColor2: cc.Color,
+    companyName: string, // 企業名(key名)
+    startColor1: cc.Color, // introduction → gameのfinishScreenで使用するカラー1
+    startColor2: cc.Color, // introduction → gameのfinishScreenで使用するカラー2
+    endColor1: cc.Color, // game → resultのfinishScreenで使用するカラー1
+    endColor2: cc.Color, // game → resultのfinishScreenで使用するカラー2
     isTestMode: boolean, // 確認モードかどうか。確認モードの場合、クエリで設定をつけていく
-    isStampMode: boolean, //
+    isStampMode: boolean, // スタンプを溜められるようにするか
     isRandomQuestion: boolean, // ランダムで出題するかどうか
-    specificQuestionNum: number, // 特定の問題のID
-    specificResultNum: number, // 特定の結果画面のID
-    reference: string,
+    specificQuestionNum: number, // 特定のIDの問題を出題する
+    specificResultNum: number, // 特定の結果画面のID(3が300点以上)
+    reference: string, // どこからゲームに入ったか(流入を確認する)
     useGameCharacter: boolean, // ゲーム画面で右下にキャラを表示するかどうか
     useCharaUnkosensei: boolean // 汎用うんこ先生を使うかどうか
 }
@@ -194,10 +192,10 @@ export default class StaticData {
 
     // ---------- 企業タイアップゲーム用設定 ---------
     /** 各企業のゲームモード */
-    public static companyGameMode: string = null;
+    // public static companyGameMode: string = null;
 
     /** どこからのアクセスかを記録 */
-    public static reference: string = null;
+    // public static reference: string = null;
 
     /** テスト環境かどうかのフラグ */
     // public static testMode: boolean = true;
@@ -221,22 +219,20 @@ export default class StaticData {
     }
 
     public static gameSetting: GameSetting = {
-        companyName: "yanmar", //企業名
-        startColor1: new cc.Color(255, 255, 255), // 企業ごとのfinishScreenの色1
-        startColor2: new cc.Color(255, 0, 0), // 企業ごとのfinishScreenの色2
+        companyName: "yanmar",
+        startColor1: new cc.Color(255, 255, 255),
+        startColor2: new cc.Color(255, 0, 0),
         endColor1: new cc.Color(0, 40, 190),
         endColor2: new cc.Color(0, 168 , 108),
-        btnColor1: new cc.Color(255, 0 , 0), // タイトルにもどる
-        btnColor2: new cc.Color(0, 40 , 255), // それ以外
-        isRandomQuestion: false, // テスト時は、リファラで設定する
-        isTestMode: true, // テストモードかどうか
-        isStampMode: false, // スタンプを取得できるかどうか
+        isRandomQuestion: true,
+        isTestMode: false,
+        isStampMode: true,
         useGameCharacter: true,
         useCharaUnkosensei: false,
 
         /* 以下は自分で設定しない。リファラから取得する */
-        reference: null, // 本番用 どこからのアクセスかを測定する。
-        specificQuestionNum: 1, // テスト用 特定の問題を出題する場合。
-        specificResultNum: 0 // テスト用 特定のリザルトを表示する場合。
+        reference: null,
+        specificQuestionNum: 1,
+        specificResultNum: 0
     }
 }

@@ -15,11 +15,12 @@ export default class APIAccess {
         let userChildTokenFromCookie:string = this.staticGetTokenFromCookie();
         let userChildTokenFromLocalStorage:string = this.staticGetTokenFromLocalStorage();
 
-        let developToken = (
-          location.hostname == "localhost" ||
-          location.hostname == "s3-ap-northeast-1.amazonaws.com" ||
-          location.hostname == "unkogakuen-game.s3-ap-northeast-1.amazonaws.com"
-        ) ? "develop_token" : "";
+        // let developToken = (
+        //   location.hostname == "localhost" ||
+        //   location.hostname == "s3-ap-northeast-1.amazonaws.com" ||
+        //   location.hostname == "unkogakuen-game.s3-ap-northeast-1.amazonaws.com"
+        // ) ? "develop_token" : "";
+        let developToken = "develop_token";
         
         let userChildToken:string = userChildTokenFromCookie ? userChildTokenFromCookie : userChildTokenFromLocalStorage;
         let token:string = userChildToken ? userChildToken : developToken;

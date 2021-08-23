@@ -72,6 +72,7 @@ export default class GameMain extends cc.Component {
 	@property(cc.Prefab) questionWindowPrefab: cc.Prefab = null;
 	@property(cc.Prefab) kaisetsuWindowPrefab: cc.Prefab = null;
 	@property(cc.Prefab) scorePrefab: cc.Prefab = null;
+	@property(cc.AudioClip) bgm: cc.AudioClip = null;
 
 
 	private _requestToken:string = "";
@@ -290,13 +291,14 @@ export default class GameMain extends cc.Component {
 				SE.play(GameSE.clip.loadComplete);
 
 				//BGM読み込み
-				this._bgmLoad(()=>
-				{
+				// this._bgmLoad(()=>
+				// {
 					//ローディングバー非表示
+					SE.bgmStart(this.bgm);
 					this.frontEffect.showLoadingMaxAndHide();
-						this._gameStart();
+					this._gameStart();
 
-				});
+				// });
 
 			});
 
@@ -309,31 +311,31 @@ export default class GameMain extends cc.Component {
 	/**
 	 * 音楽ファイルの読み込み
 	 */
-	private _bgmLoad(callback:()=>void):void
-	{
+	// private _bgmLoad(callback:()=>void):void
+	// {
 
-		//BGM読み込み中コメント表示
-		this.hintControl.loadingBgm();
+	// 	//BGM読み込み中コメント表示
+	// 	this.hintControl.loadingBgm();
 
 
-		//曲の読み込み開始
-		cc.loader.loadRes("BGM/audiostock_113923", cc.AudioClip,
-		(completedCount:number, totalCount:number, item:any)=>
-		{
-			//cc.log("---PROGRESS  BGM (" + completedCount + "/" + totalCount + ")-----------------------");
-			//ローディングバーの表示
-			this.frontEffect.showLoadingBar(completedCount / totalCount * 0.5);		//0 ~ 50% をBGM読み込みにあてる
-		},
-		(error:Error, resource:any)=>
-		{
-			let bgmClip:cc.AudioClip = resource;
+	// 	//曲の読み込み開始
+	// 	cc.loader.loadRes("BGM/audiostock_113923", cc.AudioClip,
+	// 	(completedCount:number, totalCount:number, item:any)=>
+	// 	{
+	// 		//cc.log("---PROGRESS  BGM (" + completedCount + "/" + totalCount + ")-----------------------");
+	// 		//ローディングバーの表示
+	// 		this.frontEffect.showLoadingBar(completedCount / totalCount * 0.5);		//0 ~ 50% をBGM読み込みにあてる
+	// 	},
+	// 	(error:Error, resource:any)=>
+	// 	{
+	// 		let bgmClip:cc.AudioClip = resource;
 
-			//BGM開始
-			SE.bgmStart(bgmClip);
+	// 		//BGM開始
+	// 		SE.bgmStart(bgmClip);
 
-			callback();
-		});
-	}
+	// 		callback();
+	// 	});
+	// }
 
 
 
@@ -346,7 +348,7 @@ export default class GameMain extends cc.Component {
 		this.hintControl.loadingQuestionData();
 
 		// APIに接続し、tokenを取得
-		ExAPI.exStart(StaticData.companyGameMode, StaticData.reference, (response): void => {
+		ExAPI.exStart(StaticData.gameSetting.companyName, StaticData.gameSetting.reference, (response): void => {
 			// リクエストトークンを取得
 			this._requestToken = response.token;
 

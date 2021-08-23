@@ -21,6 +21,8 @@ export default class ScoreBar extends cc.Component
     @property(cc.SpriteFrame) totalNumbers: cc.SpriteFrame[] = [];
     @property(cc.SpriteFrame) stampSprites: cc.SpriteFrame[] = [];
 
+    @property(cc.AudioClip) markSE: cc.AudioClip[] = [];
+
     _totalScore: number = null;
 
     public setup(): void {
@@ -49,7 +51,7 @@ export default class ScoreBar extends cc.Component
         let activateMark = () => {
             if (dispNum !== 0) {
                 this.gauge.children[count].active = true;
-                // this._sound.SE(this._sound.seMark[count]);
+                SE.play(this.markSE[count]);
                 count ++;
             }
             let timer = setTimeout(activateMark, 200 - (count*10));

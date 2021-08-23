@@ -12,7 +12,7 @@ const {ccclass, property} = cc._decorator;
 export default class GameBG extends cc.Component {
 
     @property(cc.Color) backGroundColor:(cc.Color) = cc.color(0,0,0);
-    @property(cc.Node) resultBg:cc.Node = null;
+    // @property(cc.Node) resultBg:cc.Node = null;
 
 
     /**
@@ -128,7 +128,7 @@ export default class GameBG extends cc.Component {
     public changeResultBG():void
     {
         cc.log("GameBG::changeResultBG");
-        if(this.resultBg) this.resultBg.active = true;
+        // if(this.resultBg) this.resultBg.active = true;
     }
 
 

@@ -266,6 +266,9 @@
     "scorePrefab": {
       "__uuid__": "2ff7e0ff-36c4-42f2-a608-1762bacd4566"
     },
+    "bgm": {
+      "__uuid__": "b6fc58fd-5e60-45e3-a327-4e9f0942c252"
+    },
     "_id": "6cK6MV6alHRavRCQOl6mu7"
   },
   {
@@ -4397,7 +4400,6 @@
     "kaisetsuBtnNattoku": {
       "__uuid__": "ef93e947-30d1-47ae-bef5-b6258e530772"
     },
-    "vsBGM": null,
     "_id": "33KvCGyPFOI50Vti/2Dk48"
   },
   {

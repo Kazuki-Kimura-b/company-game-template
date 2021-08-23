@@ -2319,8 +2319,8 @@
     "_color": {
       "__type__": "cc.Color",
       "r": 255,
-      "g": 255,
-      "b": 255,
+      "g": 0,
+      "b": 0,
       "a": 255
     },
     "_contentSize": {
@@ -2691,9 +2691,6 @@
     "finishScreenParentNode": {
       "__id__": 41
     },
-    "bgmAudioClip": {
-      "__uuid__": "d250d1d2-4e96-4b8d-956d-d7385e68d3d5"
-    },
     "seShock": {
       "__uuid__": "a04b3581-b967-4663-b5af-984765664e3d"
     },
@@ -2752,6 +2749,12 @@
     },
     "lockModal": {
       "__id__": 137
+    },
+    "bgmBefore": {
+      "__uuid__": "66d11a4f-6b50-4494-9858-ae674a5e4d0b"
+    },
+    "bgmAfter": {
+      "__uuid__": "66d11a4f-6b50-4494-9858-ae674a5e4d0b"
     },
     "_id": "44ShHAqNVFxr0LI//g+IXS"
   },
@@ -3047,8 +3050,8 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 255,
-      "g": 255,
+      "r": 0,
+      "g": 40,
       "b": 255,
       "a": 255
     },
@@ -3491,8 +3494,8 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 255,
-      "g": 255,
+      "r": 0,
+      "g": 40,
       "b": 255,
       "a": 255
     },
@@ -3935,8 +3938,8 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 255,
-      "g": 255,
+      "r": 0,
+      "g": 40,
       "b": 255,
       "a": 255
     },

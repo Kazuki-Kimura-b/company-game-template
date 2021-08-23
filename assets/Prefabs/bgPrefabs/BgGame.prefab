@@ -405,7 +405,7 @@
     "sync": false
   },
   {
-    "__type__": "04a1bEtIhxJHrovN9TlKUDA",
+    "__type__": "ab149+yu2NHcq7AidwEF8nJ",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -420,11 +420,6 @@
       "a": 255
     },
     "resultBg": null,
-    "sensei": null,
-    "senseiSprite": null,
-    "unkoSenseiSpriteFrames": [],
-    "foodSprite": null,
-    "foodSpriteFrames": [],
     "_id": ""
   },
   {

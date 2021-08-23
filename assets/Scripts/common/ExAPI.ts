@@ -240,7 +240,7 @@ export default class SchoolAPI extends APIAccess
             xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
             xhr.timeout = SchoolAPI.TIME_OUT;
 
-            xhr.onload = (ev:ProgressEvent<EventTarget>)=>
+            xhr.onload = ()=>
             {
                 this._closeAccessIcon();        //アイコンを消す
                 
@@ -401,7 +401,7 @@ export default class SchoolAPI extends APIAccess
     
             xhr.open( 'POST', url, true );
             // POST 送信の場合は Content-Type は固定.
-            xhr.setRequestHeader( 'Content-Type', 'application/json' );
+            xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
             xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
             xhr.timeout = SchoolAPI.TIME_OUT;
     
@@ -451,13 +451,13 @@ export default class SchoolAPI extends APIAccess
                 });
             };
             
-            let json =
-            {
-                token: requestToken,
-                scoring_total: score
-            }
-            xhr.send(JSON.stringify(json));
-            xhr.send(`token=${requestToken}`);
+            // let json =
+            // {
+            //     token: requestToken,
+            //     scoring_total: score
+            // }
+            // xhr.send(JSON.stringify(json));
+            xhr.send(`token=${requestToken}&scoring_total=${score}`);
         } else {
             callback("exEnd: test mode")
         }
@@ -543,21 +543,20 @@ export default class SchoolAPI extends APIAccess
     public static exGetTopContents(callback:(response:any)=>void):void
     {
         let xhr:XMLHttpRequest = new XMLHttpRequest();
-        let url:string = this.staticGetUnkoGakuenHost() + "/api/v2/tie_up/top_page_contents";
-        
-        xhr.open("GET", url + "?categories[]=anzen&categories[]=seikatsu", true);
+        let url:string = this.staticGetHost() + "/api/v1/tie_up/games";
+        xhr.open("GET", url, true);
         xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
         xhr.timeout = SchoolAPI.TIME_OUT;
-
+  
         xhr.onload = (ev:ProgressEvent<EventTarget>)=>
         {
             let response:any = null;
-
+  
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200)
             {
                 let responseText:string = xhr.responseText;
                 let json:any = JSON.parse(responseText);
-
+  
                 if (json == null)
                 {
                     cc.log("GET STAMPS ERROR");
@@ -568,7 +567,7 @@ export default class SchoolAPI extends APIAccess
                     callback(response);
                 }
             }
-        };
-        xhr.send();
-     }
+          };
+          xhr.send();
+       }
 }

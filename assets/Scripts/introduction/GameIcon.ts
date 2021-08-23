@@ -15,6 +15,6 @@ export default class GameIcon extends cc.Component
     }
 
     private onPressBtn(): void {
-        window.location.href = this.url;
+        window.open(this.url, "_brank");
     }
 }

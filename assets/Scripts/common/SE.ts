@@ -13,7 +13,7 @@ export default class SE
     public static set BGM_Enabled(value:boolean) { this._BGM_Enabled = value; }
 
     protected static readonly SE_VOLUME:number = 0.3;
-    protected static readonly BGM_VOLUME:number = 0.1;
+    protected static readonly BGM_VOLUME:number = 0.3;
     //protected static _seVolume:number = 1.0;
     protected static _lastBgmAudioClip:cc.AudioClip = null;
 

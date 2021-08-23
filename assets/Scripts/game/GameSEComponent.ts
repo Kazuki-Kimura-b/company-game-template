@@ -58,7 +58,7 @@ export class GameSE
         /** 解説：先生もなっとく */
         public kaisetsuBtnNattoku: cc.AudioClip,
         /** ストーリー部分のbgm */
-        public vsBGM: cc.AudioClip
+        // public vsBGM: cc.AudioClip
     ){}
 }
 
@@ -96,7 +96,7 @@ export default class GameSEComponent extends cc.Component
     @property({type:cc.AudioClip}) kaisetsuSenseiBikkuri: cc.AudioClip = null;
     @property({type:cc.AudioClip}) kaisetsuBtnNattoku: cc.AudioClip = null;
 
-    @property({type:cc.AudioClip}) vsBGM: cc.AudioClip = null;
+    // @property({type:cc.AudioClip}) vsBGM: cc.AudioClip = null;
 
 
     start ()
@@ -127,7 +127,7 @@ export default class GameSEComponent extends cc.Component
             this.kaisetsuSenseiUnazuki,
             this.kaisetsuSenseiBikkuri,
             this.kaisetsuBtnNattoku,
-            this.vsBGM
+            // this.vsBGM
         );
     }
 }
