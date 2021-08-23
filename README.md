@@ -1,29 +1,41 @@
-# bk-unko-school
+### 概要
+企業タイアップゲームのテンプレートです。  
+これを改変しながら企業ごとのゲームを作成してください。  
+以下の項目を主に変更します。
 
-Cocos Creator
+***
 
-![Build](https://github.com/radicodeinc/bk-unko-school/workflows/Build/badge.svg)
+### ゲームごとの全般的な設定
+設定ファイル：　**`/assets/Scripts/StaticData.ts`**  
+この中の`gameSetting`から各変数を設定してください。
+基本的にはinterfaceのコメントに記載していますが、以下重要なものについて説明します。  
+| 項目 | 説明 |
+| ----| ----|
+| `companyName` | 企業名を入れてください。APIで指定する`mode`と同一にする必要があります。  
+| `isTestMode` | trueの場合テストモードになります。テストモードでは、すべてのAPIが切断されます。ローカルでの開発の際に使用してください。
+| `isStampMode` | スタンプを表示するかどうかを設定します。表示しない場合、最後の画面でボタンが削除されるため、スタンプ一覧もできなくなります。
 
+### テストモードについて 
+テストモードでは、クエリをつけることで便利な設定をすることができます。  
+| 項目 | 説明 |
+| ---- | ---- |
+| `?question=1` | questionを番号で指定することで、指定したIDの問題から出題することができます。  
+| `?result=1` | resultを番号で指定することで、問題画面をとばして結果画面を表示することができます。<br>1：250点以下、2:300点未満、3：300点以上になります。  
+| `?random` | randomを指定することで、問題をランダムに出題することができます。<br>`isRandomQuestion`が指定されている場合は、クエリに関わらずランダムに出題されます。  
 
-## CLI
+***
 
-### Build
+### セリフと問題
+セリフと問題はすべて`/assets/resources/json`フォルダ内のjsonで管理しています。
+| ファイル名 | 内容 |
+| ---- | ---- |
+| `endingScript1` | 250点未満のときの最後の会話文
+| `endingScript2` | 250点以上300点未満のときの最後の会話文
+| `endingScript3` | 300点以上のときの最後の会話文
+| `introductionScript` | ゲーム開始前の会話文
+| `opponent` | 対戦相手の情報。タイアップゲームはほぼすべてうんこ先生なので変更しなくて大丈夫です。
+| `questions` | 問題データです。
 
-for Mac
+***
 
-```
-/Applications/CocosCreator.app/Contents/MacOS/CocosCreator --path ${PROJECT_PATH} --build 'platform=web-mobile;debug=false'
-```
-
-### Upload
-
-Please, install docker-compose!
-
-```
-docker-compose run -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY aws-cli s3 sync /web-mobile s3://unkogakuen-game/cocos/${PROJECT_NAME}/ --delete --acl public-read
-```
-
-### Confirm
-```
-open https://unkogakuen-game.s3-ap-northeast-1.amazonaws.com/cocos/${PROJECT_NAME}/index.html
-```
+### 
