@@ -37,5 +37,3 @@
 | `questions` | 問題データです。
 
 ***
-
-### CocosCreatorのエディター
