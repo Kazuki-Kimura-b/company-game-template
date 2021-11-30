@@ -22,10 +22,13 @@ export default class ScoreBar extends cc.Component
     @property(cc.SpriteFrame) stampSprites: cc.SpriteFrame[] = [];
 
     @property(cc.AudioClip) markSE: cc.AudioClip[] = [];
+    @property(cc.AudioClip) countSE: cc.AudioClip = null;
 
     _totalScore: number = null;
+    _countID: number = null;
 
     public setup(): void {
+        this.buttonNext.active = false;
         this.gauge.setPosition(-190, -1350);
         this.scoreBoard.setPosition(110, 1258);
     }
@@ -75,6 +78,7 @@ export default class ScoreBar extends cc.Component
         activateMark();
     }
     public countup(node: cc.Node, score: number): void {
+        this._countID = SE.play(this.countSE);
         this.totalScoreOutput.runAction(cc.valueTo(0.5, this._totalScore, this._totalScore + score, (value) => {
             let num: number = Math.floor(value);
             this.totalScoreOutput.children[0].getComponent(cc.Sprite).spriteFrame = this.totalNumbers[num % 10];
@@ -88,6 +92,10 @@ export default class ScoreBar extends cc.Component
             node.children[2].getComponent(cc.Sprite).spriteFrame = this.numbers[Math.floor(num / 100) % 10];
         }));
         this._totalScore += score;
+        cc.tween(this.node)
+        .delay(0.5)
+        .call(() => {SE.stop(this._countID)})
+        .start();
     }
 
     private onPressEndResult(): void {

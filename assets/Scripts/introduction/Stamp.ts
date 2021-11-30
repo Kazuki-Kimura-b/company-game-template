@@ -9,6 +9,9 @@ export default class Stamp extends cc.Component
     @property(SchoolText) nameOutput: SchoolText = null;
     @property(cc.Sprite) unko: cc.Sprite = null;
 	@property(cc.Node) fukidashi: cc.Node = null;
+	@property(cc.Node) text: cc.Node = null;
+
+	isGet: boolean = false;
 
     public setName(name: string): void {
         let format:STFormat = STFormat.create({
@@ -28,10 +31,12 @@ export default class Stamp extends cc.Component
     }
 
 	private onPressStamp(): void {
-		let parent: cc.Node = this.node.parent;
-		for (let i =0; i < parent.children.length; i++) {
-			parent.children[i].getChildByName("fukidashi").active = false;
+		if (this.isGet) {
+			let parent: cc.Node = this.node.parent;
+			for (let i =0; i < parent.children.length; i++) {
+				parent.children[i].getChildByName("fukidashi").active = false;
+			}
+			this.fukidashi.active = true;
 		}
-		this.fukidashi.active = true;
 	}
 }

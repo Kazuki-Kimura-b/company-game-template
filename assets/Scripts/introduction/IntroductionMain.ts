@@ -46,6 +46,8 @@ export default class IntroductionMain extends cc.Component
     @property(cc.Prefab) gameIcon: cc.Node = null;
     @property(cc.Prefab) stamp: cc.Prefab = null;
     @property(cc.Node) lockModal: cc.Node = null;
+    @property(cc.Node) breeGetModal: cc.Node = null;
+    @property(cc.Node) breeGetMsg: cc.Node = null;
 
     @property({ type:cc.AudioClip }) bgmBefore:cc.AudioClip = null;
     @property({ type:cc.AudioClip }) bgmAfter:cc.AudioClip = null;
@@ -59,49 +61,51 @@ export default class IntroductionMain extends cc.Component
     start ()
     {
         if (StaticData.gameSetting.specificResultNum > 0) {
-            let gameKeys: string[] = [];
             // 他のゲーム一覧を取得
             ExAPI.exGetTopContents((res) => {
-                this.gameArea.setContentSize(750, 68 + (240 * Math.floor(res.length / 4)));
+                this.gameArea.setContentSize(750, 46 + (242 * Math.ceil(res.length / 3)));
                 res.forEach((v, index) => {
-                    gameKeys.push(v.key);
-                    ExAPI.loadImage(v.theme, v.image_url, (result) => {
+                    ExAPI.loadImage(v.name, v.image_url, (result) => {
                         let node: cc.Node = cc.instantiate(this.gameIcon);
                         let controller: GameIcon = node.getComponent(GameIcon);
                         controller.image.spriteFrame = result.image;
-                        controller.setBtnURL(v.link);
+                        controller.setBtnURL(`https://play.unkogakuen.com/manabi/game/${v.game_url}/?rf=game`);
                         node.setPosition(-218 + (218 * (index % 3)), -154 - (240 * Math.floor(index / 3)));
                         this.gameArea.addChild(node);
                     });
                 });
-                cc.log(gameKeys);
                 // スタンプ一覧を取得
                 if (StaticData.gameSetting.isStampMode) {
+                    let gameKeys: string[] = [];
                     ExAPI.exGetStamp((res) => {
-                        this.stampArea.setContentSize(750, 68 + (240 * Math.floor(res.length / 4)));
-                        let index: number = 0;
-                        for (let key of gameKeys) {
-                            ExAPI.loadImage("key", res[key].stamp_icon_url, (result) => {
+                        console.log(res);
+                        Object.keys(res).forEach((v) => {
+                            gameKeys.push(v);
+                        });
+                        this.stampArea.setContentSize(750, 46 + (242 * Math.ceil(gameKeys.length / 3)));
+                        gameKeys.forEach((v, index) => {
+                            ExAPI.loadImage("key", res[v].stamp_icon_url, (result) => {
                                 let node: cc.Node = cc.instantiate(this.stamp);
                                 let controller: Stamp = node.getComponent(Stamp);
-                                controller.setName(res[key].name);
+                                controller.setName(res[v].name);
+                                // ブリーゲットのテキスト表示
+                                if (index % 3 === 2) controller.text.active = true;
                                 // ゲストでない場合、取得していたら表示する
-                                if (ExAPI.staticGetToken() !== "develop_token" && res[key].stamp) {
+                                if (ExAPI.staticGetToken() !== "develop_token" && res[v].stamp) {
+                                    controller.text.active = false;
                                     controller.unko.spriteFrame = result.image;
+                                    controller.isGet = true;
                                 }
                                 node.setPosition(-218 + (218 * (index % 3)), -154 - (240 * Math.floor(index / 3)));
                                 this.stampArea.addChild(node);
-                                index++;
-                            })
-                            // res[key]
-                        }
+                            });
+                        })
                     });
                 } else {
                     // スタンプタブを非表示
                     this.lastBoard.getChildByName("tab_stamp").active = false;
                 }
             });
-
         }
 
         // 背景を読み込み
@@ -147,9 +151,6 @@ export default class IntroductionMain extends cc.Component
         {
             if (code == "changeFace") {
                 _introductionBG.changeSenseiFace(Number(subCode));
-            }
-            if (code == "hakushu") {
-                _introductionBG.hakushu();
             }
         });
 
@@ -280,11 +281,36 @@ export default class IntroductionMain extends cc.Component
     private _openMenu(): void {
         if (!StaticData.gameSetting.isStampMode) {
             this.menuBoard.getChildByName("introduction_button_3").active = false;
-            this.menuBoard.getChildByName("introduction_button_4").setPosition(0, -400);
-            this.menuBoard.runAction(cc.moveTo(0.2, 0, -60));
+            this.menuBoard.getChildByName("introduction_button_4").setPosition(0, -306);
+            this.menuBoard.runAction(
+                cc.sequence(
+                    cc.moveTo(0.2, 0, 0),
+                    cc.callFunc(() => {this._openBreeGetModal()})
+                )
+            );
         } else {
-            this.menuBoard.runAction(cc.moveTo(0.2, 0, 100));
+            this.menuBoard.runAction(
+                cc.sequence(
+                cc.moveTo(0.2, 0, 0),
+                cc.callFunc(() => {this._openBreeGetModal()})
+            ));
         }
+    }
+
+    private _openBreeGetModal(): void {
+        if (StaticData.playerData.acquiredBree) {
+            this.breeGetModal.active = true;
+            this.breeGetMsg.runAction(cc.scaleTo(.4, 1).easing(cc.easeBackOut()));
+        }
+    }
+
+    private onPressBreeGetModal(): void {
+        this.breeGetMsg.runAction(
+            cc.sequence(
+                cc.scaleTo(.4, 0).easing(cc.easeBackIn()),
+                cc.callFunc(() => this.breeGetModal.active = false)
+            )
+        );
     }
 
     /**
@@ -327,7 +353,7 @@ export default class IntroductionMain extends cc.Component
     private onPressTabButton(event, code: string): void {
         if (code === "game") {
             // ゲームタブを開く
-            this.lastBoard.getChildByName("tabBar").color = new cc.Color(255, 239, 0);
+            this.lastBoard.getChildByName("tabBar").color = new cc.Color(255, 100, 200);
             this.lastBoard.getChildByName("game").active = true;
             this.lastBoard.getChildByName("stamp").active = false;
             this.lastBoard.active = true;
@@ -343,7 +369,7 @@ export default class IntroductionMain extends cc.Component
             this.stampArea.children.forEach((v) => {
                 v.getChildByName("fukidashi").active = false;
             });
-            this.lastBoard.getChildByName("tabBar").color = new cc.Color(60, 250, 200);
+            this.lastBoard.getChildByName("tabBar").color = new cc.Color(255, 240, 0);
             this.lastBoard.getChildByName("game").active = false;
             this.lastBoard.getChildByName("stamp").active = true;
             this.lastBoard.active = true;

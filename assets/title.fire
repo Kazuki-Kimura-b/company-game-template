@@ -1146,7 +1146,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "title_startBtn_textext",
+    "_name": "text",
     "_objFlags": 0,
     "_parent": {
       "__id__": 18

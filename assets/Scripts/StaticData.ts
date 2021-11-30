@@ -63,6 +63,7 @@ export enum SpecialEvent
 
 interface PlayerData {
     name: string,
+    acquiredBree: boolean
 }
 
 interface OpponentData {
@@ -201,7 +202,8 @@ export default class StaticData {
     // public static testMode: boolean = true;
 
     public static playerData: PlayerData = {
-        name: "あなた"
+        name: "あなた",
+        acquiredBree: false
     };
 
     public static opponentData: OpponentData = {
@@ -220,12 +222,12 @@ export default class StaticData {
 
     public static gameSetting: GameSetting = {
         companyName: "yanmar",
-        startColor1: new cc.Color(255, 255, 255),
-        startColor2: new cc.Color(255, 0, 0),
-        endColor1: new cc.Color(0, 40, 190),
-        endColor2: new cc.Color(0, 168 , 108),
-        isRandomQuestion: true,
-        isTestMode: false,
+        startColor1: cc.color(255, 255, 255),
+        startColor2: cc.color(255, 0, 0),
+        endColor1: cc.color(0, 40, 190),
+        endColor2: cc.color(0, 168 , 108),
+        isRandomQuestion: false,
+        isTestMode: true,
         isStampMode: true,
         useGameCharacter: true,
         useCharaUnkosensei: false,

@@ -1,7 +1,7 @@
 {
   "name": "うんこ{先生,せんせい}",
   "unko_get_script": "農業のうんこだ",
-  "play_script": "さいごのもんだいじゃ！",
+  "play_script": "<i>さいごのもんだいじゃ！</i>",
   "correct_script1": "なかなかやるのう！その{調子,ちょうし}じゃ！",
   "correct_script2": "すばらしい！よくできておるぞい！",
   "correct_script3": "",

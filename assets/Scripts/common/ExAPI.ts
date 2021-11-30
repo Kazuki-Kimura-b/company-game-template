@@ -1,3 +1,4 @@
+import { request } from "http";
 import StaticData from "../StaticData";
 import APIAccess from "./APIAccess"
 import APIErrorPopup, { APIErrorType } from "./APIErrorPopup";
@@ -27,7 +28,7 @@ export default class SchoolAPI extends APIAccess
         this._DUMMY_DATA_MODE = true;
     }
 
-    
+
     /**
      * エラー時のポップアップを設定
      * @param popup 
@@ -227,6 +228,11 @@ export default class SchoolAPI extends APIAccess
      */
     public static exStart(gameMode:string, reference: string, callback:(response:any)=>void):void
     {
+        // ここあとで消す
+        // let query: string = window.location.search.replace("?", "");
+        // let tmp: string[] = query.split("=");
+        // if (tmp[0] === "game") gameMode = tmp[1];
+        // cc.log(gameMode);
         if (!StaticData.gameSetting.isTestMode) {
             this._aliveTokenCheck();        //トークンがあるか確認
             this._startAccessIcon();        //アイコンの表示
@@ -408,18 +414,17 @@ export default class SchoolAPI extends APIAccess
             xhr.onload = (ev:ProgressEvent<EventTarget>)=>
             {
                 this._closeAccessIcon();        //アイコンを消す
-                
+
                 cc.log(xhr.status);
-                
+
                 let response = null;
-    
+
                 if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200)
                 {
                     let responseText:string = xhr.responseText;
                     response = JSON.parse(responseText);
 
                     cc.log("EX RESULT REGISTER --------------");
-                    cc.log(response);
 
                     cc.log("RequestToken:" + response.token);
 
@@ -443,14 +448,14 @@ export default class SchoolAPI extends APIAccess
             xhr.onerror = xhr.ontimeout = (ev:ProgressEvent<EventTarget>)=>
             {
                 this._closeAccessIcon();        //アイコンを消す
-                
+
                 //再接続
                 this._errorPopup(APIErrorType.OFFLINE, ()=>
                 {
                     this.exEnd(requestToken, score, callback);
                 });
             };
-            
+
             // let json =
             // {
             //     token: requestToken,
@@ -459,13 +464,16 @@ export default class SchoolAPI extends APIAccess
             // xhr.send(JSON.stringify(json));
             xhr.send(`token=${requestToken}&scoring_total=${score}`);
         } else {
-            callback("exEnd: test mode")
+            let res = {
+                acquiredBree: true
+            }
+            callback(res);
         }
      }
 
     public static importGameSettings(callback:()=>void): void {
         //  jsonの読み込み
-        if (StaticData.gameSetting.isTestMode) {
+        if (!(location.hostname === "play.unkogakuen.com")) {
             let query: string = window.location.search.replace("?", "");
             let settings: string[] = query.split("&");
             for (let item of settings) {
@@ -536,7 +544,7 @@ export default class SchoolAPI extends APIAccess
         xhr.send();
      }
 
-     /**
+    /**
     * トップページコンテンツ取得用API
     * @param callback
     */
@@ -570,4 +578,51 @@ export default class SchoolAPI extends APIAccess
           };
           xhr.send();
        }
+
+       /**
+        * 問題取得用API
+        */
+        public static exQuestion(requestToken: string, callback:(response:any)=>void): void {
+            if (!StaticData.gameSetting.isTestMode) {
+                let xhr:XMLHttpRequest = new XMLHttpRequest();
+                let query: string = `?token=${requestToken}&limit=10`;
+                if (StaticData.gameSetting.specificQuestionNum < 10) {
+                    query += `&question_cid_offset=${StaticData.gameSetting.specificQuestionNum}`
+                } else {
+                    query += `&question_cid_offset=${StaticData.gameSetting.specificQuestionNum}`
+                }
+                if (StaticData.gameSetting.isRandomQuestion) query += "&sorts=rand";
+                cc.log(query);
+                let url:string = this.staticGetHost() + "/api/v1/external_study/question" + query;
+                xhr.open("GET", url, true);
+                xhr.setRequestHeader( 'TOKEN', this.staticGetToken() );
+                xhr.timeout = SchoolAPI.TIME_OUT;
+    
+                xhr.onload = (ev:ProgressEvent<EventTarget>)=>
+                {
+                    let response:any = null;
+        
+                    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200)
+                    {
+                        let responseText:string = xhr.responseText;
+                        let json:any = JSON.parse(responseText);
+        
+                        if (json == null)
+                        {
+                            cc.log("GET QUESTIONS ERROR");
+                        }
+                        else
+                        {
+                            response = json;
+                            callback(response);
+                        }
+                    }
+                };
+                xhr.send();
+            } else {
+                cc.loader.loadRes("json/questions", (err, res) => {
+                    callback(res.json);
+                });
+            }
+        }
 }

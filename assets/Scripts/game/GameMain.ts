@@ -265,13 +265,13 @@ export default class GameMain extends cc.Component {
 	private _setIjinCenter(duration:number):void
 	{
 		this.ijinScreen.ijinScaleTo(IjinScreen.SCALE_STORY, duration);
-		this.ijinScreen.ijinMoveTo(cc.v2(0, IjinScreen.Y_STORY), duration);
+		this.ijinScreen.ijinMoveTo(cc.v2(0, 400), duration);
 	}
 
 
 	private _sceneStart():void
 	{
-		this._QNum = StaticData.gameSetting.specificQuestionNum - 1;
+		// this._QNum = StaticData.gameSetting.specificQuestionNum - 1;
 
 		this.frontEffect.initialize();
 
@@ -356,21 +356,12 @@ export default class GameMain extends cc.Component {
 			this.hintControl.setupBasicHints(response);
 
 			// 問題データを取得
-			cc.loader.loadRes("json/questions", (err, res) => {
-				this._qDatas = res.json;
-				if (StaticData.gameSetting.isRandomQuestion) {
-					for (var i = this._qDatas.length - 1; i > 0; i--) {
-						var r = Math.floor(Math.random() * (i + 1));
-						var tmp = this._qDatas[i];
-						this._qDatas[i] = this._qDatas[r];
-						this._qDatas[r] = tmp;
-					}
-				}
-				cc.log(this._qDatas);
+			ExAPI.exQuestion(this._requestToken, (res): void => {
+				this._qDatas = res;
+				cc.log(this._qDatas)
 				this._makeLoadImageList();
-
 				callback();
-			})
+			});
 		});
 	}
 
@@ -1180,9 +1171,11 @@ export default class GameMain extends cc.Component {
 		// スタンプ取得しない場合は、0点で保存する
 		let score: number = 0;
 		if (StaticData.gameSetting.isStampMode) score = this._gameScore;
-		ExAPI.exEnd(this._requestToken, score, ()=>
+		ExAPI.exEnd(this._requestToken, score, (res)=>
 		{
 			cc.log("GAME END RESPONSE");
+			console.log(res);
+			if (res.acquired_buree) StaticData.playerData.acquiredBree = true;
 			if (this._gameScore >= 300) {
 				StaticData.gameSetting.specificResultNum = 3;
 			} else if (this._gameScore >= 250) {

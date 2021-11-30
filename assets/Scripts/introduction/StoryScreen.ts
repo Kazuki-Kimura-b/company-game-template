@@ -58,7 +58,7 @@ export default class StoryScreen extends cc.Component
     //public static readonly CHAR_KEEP:number = 3;
 
     private static readonly BOARD_COLOR_PLAYER:cc.Color = cc.color(239, 139, 255);
-    private static readonly BOARD_COLOR_NARATION:cc.Color = cc.color(105, 105, 144);
+    private static readonly BOARD_COLOR_NARATION:cc.Color = cc.color(255, 255, 255);
 
 
     
@@ -520,7 +520,7 @@ export default class StoryScreen extends cc.Component
 
             //色を変える
             this.messageBoardSprite.node.color = StoryScreen.BOARD_COLOR_NARATION;
-            this.messageOutput.setColorFromFormat(cc.Color.WHITE);
+            this.messageOutput.setColorFromFormat(cc.Color.BLACK);
         }
         else
         {
