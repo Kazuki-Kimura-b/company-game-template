@@ -20,9 +20,7 @@ export default class IntroductionBG extends GameBG {
     @property(cc.SpriteFrame) unkoSenseiSpriteFrames: cc.SpriteFrame[] = [];
 
     start() {
-        if (StaticData.gameSetting.specificResultNum > 0) {
-            this.changeSenseiFace(1);
-        }
+        
     }
 
     public changeSenseiFace(num: number): void {
