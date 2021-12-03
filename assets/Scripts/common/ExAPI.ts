@@ -586,11 +586,7 @@ export default class SchoolAPI extends APIAccess
             if (!StaticData.gameSetting.isTestMode) {
                 let xhr:XMLHttpRequest = new XMLHttpRequest();
                 let query: string = `?token=${requestToken}&limit=10`;
-                if (StaticData.gameSetting.specificQuestionNum < 10) {
-                    query += `&question_cid_offset=${StaticData.gameSetting.specificQuestionNum}`
-                } else {
-                    query += `&question_cid_offset=${StaticData.gameSetting.specificQuestionNum}`
-                }
+                query += `&question_cid_offset=${StaticData.gameSetting.specificQuestionNum}`
                 if (StaticData.gameSetting.isRandomQuestion) query += "&sorts=rand";
                 cc.log(query);
                 let url:string = this.staticGetHost() + "/api/v1/external_study/question" + query;

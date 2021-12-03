@@ -271,7 +271,7 @@ export default class GameMain extends cc.Component {
 
 	private _sceneStart():void
 	{
-		// this._QNum = StaticData.gameSetting.specificQuestionNum - 1;
+		if (StaticData.gameSetting.isTestMode) this._QNum = StaticData.gameSetting.specificQuestionNum - 1;
 
 		this.frontEffect.initialize();
 

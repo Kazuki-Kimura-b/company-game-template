@@ -174,9 +174,9 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 255,
-      "g": 255,
-      "b": 255,
+      "r": 0,
+      "g": 162,
+      "b": 65,
       "a": 255
     },
     "_contentSize": {
@@ -234,7 +234,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "3da60fd0-9bd0-4093-a233-4f194ac2827f"
+      "__uuid__": "b1824960-95f1-462e-9da9-7574ead2d6be"
     },
     "_type": 2,
     "_sizeMode": 0,
@@ -247,9 +247,7 @@
     "_fillStart": 0,
     "_fillRange": 0,
     "_isTrimmedMode": false,
-    "_atlas": {
-      "__uuid__": "5ae768d5-088b-4c00-b987-80d03afbfa07"
-    },
+    "_atlas": null,
     "_id": ""
   },
   {
@@ -1081,7 +1079,6 @@
       "b": 0,
       "a": 255
     },
-    "resultBg": null,
     "sensei": {
       "__id__": 16
     },
@@ -1115,17 +1112,6 @@
       },
       {
         "__uuid__": "6053e1e4-a6b3-4245-9bcc-642c686574d9"
-      }
-    ],
-    "foodSprite": {
-      "__id__": 27
-    },
-    "foodSpriteFrames": [
-      {
-        "__uuid__": "e156e705-31ef-489e-be70-cbf0448a05c2"
-      },
-      {
-        "__uuid__": "1ccd0782-fa60-454b-a82b-bdf4a0448122"
       }
     ],
     "_id": ""

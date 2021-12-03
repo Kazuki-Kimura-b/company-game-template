@@ -1906,7 +1906,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 750,
-      "height": 1664
+      "height": 1600
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1957,7 +1957,7 @@
       }
     ],
     "_prefab": null,
-    "_opacity": 204,
+    "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
       "r": 0,
